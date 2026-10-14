@@ -35,12 +35,50 @@
   .question-auction .choices{gap:6px;}
   .question-auction .choice{padding:6px;font-size:12px;-webkit-line-clamp:2;max-height:3em;}
 }
+
+/* Host team mini-screens mirror the active effects shown to each player. */
+.host-effect-preview{margin:10px 0;padding:9px;border:1px solid #46547e;border-radius:11px;background:linear-gradient(145deg,#0c1226,#171d35);min-width:0;overflow:hidden}
+.host-effect-preview.has-active-effect{border-color:#53e5ed;box-shadow:inset 0 0 18px #53e5ed12}
+.host-effect-preview.team-mini-dead{border-color:#a93f5f}
+.host-mini-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#b7bfdc;font-size:11px;font-weight:800;margin-bottom:6px}
+.host-mini-live{padding:2px 6px;border-radius:20px;background:#9c2846;color:#fff;letter-spacing:.5px;font-size:10px}
+.host-mini-visual{position:relative;display:flex;align-items:center;gap:9px;min-height:49px;margin:5px 0;padding:8px;border-radius:8px;background:#292f50;border:1px solid #5d6893;overflow:hidden}
+.host-mini-visual>span{font-size:29px;flex-shrink:0}.host-mini-visual b{font-size:12px;line-height:1.45;overflow-wrap:anywhere}.host-mini-visual small{margin-left:auto;flex-shrink:0;font-size:10px;color:#ffd166}
+.host-mini-visual.meme-mini{flex-direction:column;justify-content:center;text-align:center;gap:2px;background:linear-gradient(135deg,#44285f,#222844)}
+.host-mini-visual.meme-mini>span{font-size:34px}.host-mini-visual.meme-mini b{font-size:13px}
+.host-mini-visual.mini-blink{animation:hostMiniBlink .5s steps(2,start) infinite}.host-mini-visual.mini-flip{animation:hostMiniFlip 1.4s ease-in-out infinite alternate}.host-mini-visual.mini-storm:after{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(110deg,transparent 0 11px,#c6a16b33 12px 14px)}
+@keyframes hostMiniBlink{to{opacity:.28}}@keyframes hostMiniFlip{to{transform:rotate(180deg)}}
+.host-mini-notice{padding:7px 8px;margin-top:5px;border-radius:7px;background:#302a4f;border-left:3px solid #ffd166;font-size:11px;overflow-wrap:anywhere}.host-mini-notice b{display:block;margin-bottom:2px;color:#fff}.host-mini-notice.is-loss{background:#511c32;border-left-color:#ff5f70}
+.host-mini-pending{padding:7px;margin-top:5px;border-radius:7px;color:#ffd166;background:#40351e;font-size:11px}.host-mini-tag{display:inline-block;padding:4px 7px;margin:5px 4px 0 0;border-radius:7px;background:#353b5c;color:#dbe5ff;font-size:10px}.host-mini-empty{font-size:11px;color:#8791b4;padding:5px 2px}
+/* ซ่อนส่วนแจ้งเตือนและควบคุม เมื่อไม่ได้อยู่ในหน้าเกมผู้คุม */
+#hostGame:not(.active) .host-only-panel,
+#hostGame:not(.active) .host-actions-panel {
+    display: none !important;
+}
+
+/* ซ่อนแผงทั้งหมดเมื่อหน้าเกมผู้คุมถูกซ่อน */
+#hostGame.hidden .host-only-panel,
+#hostGame.hidden .host-actions-panel {
+    display: none !important;
+}
+#hostGame.hidden .host-only-panel {
+    display: none !important;
+}
+/* ซ่อนแผงควบคุมเป็นค่าเริ่มต้น */
+.host-only-panel {
+    display: none !important;
+}
+
+/* แสดงเฉพาะเมื่ออยู่ในหน้าเกมผู้คุม */
+#hostGame:not(.hidden) .host-only-panel {
+    display: block !important;
+}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="brand"><h1>⚡ GAME SHOW BATTLE ⚡</h1><p>ເກມໂຊວ໌ແຂ່ງຂັນ • ໄອເທັມ • ຕອບຄຳຖາມ</p></header>
-  <div class="between"><span id="connection" class="status">ກຳລັງກວດກາ Firebase…</span><button class="secondary small" onclick="showSetup()">⚙ ຕັ້ງຄ່າ / ຄູ່ມື</button></div>
+  <div class="between"><span id="connection" class="status">ກຳລັງກວດກາ Firebase…</span><button class="secondary small" onclick="showSetup()" style="display:none;">⚙ ຕັ້ງຄ່າ / ຄູ່ມື</button></div>
   <section id="home">
     <div class="grid roles">
       <button class="panel role" onclick="chooseRole('host')"><div class="emoji">🎙️</div><h2>ຜູ້ຄຸມລະບົບ</h2><p class="muted">ສ້າງຫ້ອງ ແລະ ຄວບຄຸມເກມ</p></button>
@@ -57,15 +95,14 @@
     <div class="between"><h2>🎮 ເຂົ້າຫ້ອງ</h2><button class="secondary" onclick="backHome()">ກັບໜ້າຫຼັກ</button></div>
     <label>ລະຫັດຫ້ອງ 4 ຕົວເລກ</label><input id="joinCode" inputmode="numeric" maxlength="4" placeholder="1234">
     <label style="display:block;margin-top:12px">ຊື່ທີມ / ຜູ້ຫຼິ້ນ</label><input id="playerName" maxlength="24" placeholder="ຕັ້ງຊື່ທີມ">
-    <button style="margin-top:14px" onclick="joinRoom()">ເຂົ້າຫ້ອງ</button><p id="joinError" class="dangertext"></p>
+    <button id="joinRoomBtn" style="margin-top:14px" onclick="joinRoom()">ເຂົ້າຫ້ອງ</button><p id="joinError" class="dangertext"></p>
   </section>
   <section id="hostAuction" class="panel hidden">
-    <div class="between"><div><h2>🎁 ໜ້າປະມູນໄອເທັມ</h2><p class="muted">ລາຄາ ແລະ ເງິນຂອງທັງ 4 ທີມຈະອັບເດດທັນທີ</p></div><div style="text-align:right"><div id="hostAuctionTimer" class="auction-timer">03:00</div><span class="pill" id="auctionTeamCount">ຄົບ 4 ທີມ</span> <span class="pill" id="hostAuctionStatus">ກຳລັງປະມູນ</span></div></div>
-    <div class="notice">💡 ລາຄາເລີ່ມຈາກ 0. ກົດປຸ່ມ + ແຕ່ລະຄັ້ງ ລາຄາຈະເພີ່ມ 1 ເຫຼຽນ ແລະທີມທີ່ກົດຈະຈ່າຍລາຄາໃໝ່ແລະໄດ້ໄອເທັມ 1 ອັນ. ເງິນທີ່ຈ່າຍໄປແລ້ວບໍ່ຄືນໃຫ້ຜູ້ຊື້ກ່ອນ.</div>
+    <div class="between"><div><h2>🎁 ໜ້າປະມູນໄອເທັມ</h2><p class="muted"></p></div><div style="text-align:right"><div id="hostAuctionTimer" class="auction-timer">03:00</div><span class="pill" id="auctionTeamCount">ຄົບ 4 ທີມ</span> <span class="pill" id="hostAuctionStatus">ກຳລັງປະມູນ</span></div></div>
     <h3>💰 ເງິນຄົງເຫຼືອຂອງ 4 ທີມ</h3><div id="hostAuctionMoneyBoard" class="grid players"></div>
     <div id="hostAuctionEvent" class="notice auction-event">ການຊື້ແລະການປ່ຽນລາຄາຈະສະແດງຢູ່ບ່ອນນີ້</div>
-    <h3>ລາຍການໄອເທັມ • ລາຄາແບບເວລາຈິງ</h3><div id="hostAuctionTabs" class="auction-tabs"></div><div id="hostAuctionItems" class="grid items"></div>
-    <div class="actions"><button id="beginGameBtn" onclick="beginGame()">▶️ ເລີ່ມເກມ</button><button class="secondary" onclick="backToLobby()">ກັບຫ້ອງລໍຖ້າ</button></div>
+    <h3>ລາຍການໄອເທັມ</h3><div id="hostAuctionTabs" class="auction-tabs"></div><div id="hostAuctionItems" class="grid items"></div>
+    <div class="actions"><button id="beginGameBtn" onclick="beginGame()">▶️ ເລີ່ມເກມ</button>
   </section>
   <section id="playerAuction" class="panel hidden">
     <div class="between"><div><h2>🎁 ໜ້າປະມູນໄອເທັມ</h2><p class="muted">ກົດ + ເພື່ອຊື້ 1 ອັນໃນລາຄາໃໝ່. ລາຄາອັບເດດພ້ອມກັນທັງ 4 ທີມ.</p></div><div style="text-align:right"><div id="playerAuctionTimer" class="auction-timer">03:00</div><span class="pill" id="playerAuctionStatus">ກຳລັງປະມູນ</span></div></div>
@@ -75,10 +112,33 @@
     <h3>🛒 ລາຄາໄອເທັມ ແລະ ປຸ່ມຊື້</h3><div id="playerAuctionTabs" class="auction-tabs"></div><div id="playerAuctionItems" class="grid items"></div>
   </section>
   <section id="hostGame" class="hidden">
-    <div class="panel"><div class="between"><div><h2>🎛️ ໜ້າຄວບຄຸມຜູ້ຄຸມ</h2><p class="muted">ພາບສະທ້ອນໜ້າຈໍທຸກທີມແບບເວລາຈິງ</p></div><div><span class="timer" id="hostGameTimer">--</span><div id="hostRound" class="pill">ຮອບ 0/10</div></div></div>
-      <div class="actions"><button onclick="hostNextQuestion()">ຄຳຖາມຖັດໄປ</button><button class="cyan" onclick="showQuestionBank()">📚 ຄຳຖາມ JSON</button><button class="secondary" onclick="toggleHostScores()" id="toggleHostScoresBtn">👁️ ແສດງຄະແນນທຸກທີມ</button><button class="secondary" onclick="finishGame()">ຈົບເກມ</button></div><div id="hostScoreBoard" class="host-score-board hidden"></div></div>
-    <div id="hostTeams" class="grid teamboard" style="margin-top:14px"></div>
-    <div class="panel" style="margin-top:14px"><h3>🔔 ແຈ້ງເຕືອນການໃຊ້ຟັງຊັນແບບເວລາຈິງ</h3><p class="muted small">ສະແດງວ່າທີມໃດໃຊ້ຟັງຊັນໃດ ແລະສົ່ງຜົນໄປຫາທີມໃດ</p><div id="hostLiveFeed" class="live-feed"></div></div><div class="panel" style="margin-top:14px"><h3>🧰 ຄວບຄຸມຜົນກະທົບ / ຄຳຖາມ</h3><div id="hostActions" class="actions"></div></div><div id="winnerRevealPanel" class="panel winner-panel hidden"></div>
+    <div class="panel"><div class="between"><div><h2>🎛️ ໜ້າຄວບຄຸມຜູ້ຄຸມ</h2><p class="muted"></p></div><div><span class="timer" id="hostGameTimer">--</span><div id="hostRound" class="pill">ຮອບ 0/10</div></div></div>
+<div class="actions">
+  <button class="secondary"
+          onclick="toggleHostScores()"
+          id="toggleHostScoresBtn">
+    👁️ ແສດງຄະແນນທຸກທີມ
+  </button>
+
+  <button class="secondary" onclick="finishGame()">
+    🏁 ຈົບເກມ
+  </button>
+
+<button class="gold" onclick="showFinalRanking()" style="display:none;">
+  🏆 ແສດງອັນດັບ
+</button>
+</div>
+
+<div id="hostScoreBoard" class="host-score-board hidden"></div>
+</div>
+
+<div id="hostTeams" class="grid teamboard" style="margin-top:14px"></div>
+
+<div class="panel host-only-panel" style="margin-top:14px">
+  <h3>🧰 ຄວບຄຸມຜົນກະທົບ / ຄຳຖາມ</h3>
+  <div id="hostActions" class="actions"></div>
+</div>
+
   </section>
   <section id="playerGame" class="hidden">
     <div class="panel between"><div><h2 id="myTeamTitle">ທີມຂອງຂ້ອຍ</h2><span id="myScore" class="pill">ຄະແນນ 0</span></div><div><span class="timer" id="playerGameTimer">--</span><div id="myRound" class="pill">ຮອບ 0/10</div></div></div>
@@ -102,8 +162,10 @@ const firebaseConfig = {
   databaseURL: "https://bt-a3adb-default-rtdb.asia-southeast1.firebasedatabase.app"
 };
 let db=null, role=null, roomId=null, playerId=null, state=null, roomRef=null, unsub=null;
+let isJoiningRoom=false; // Prevent duplicate submissions while the join request is in flight.
 let gameTick=null, localQuestionCache=null, localOverlayTimer=null;
 let incomingPromptTimer=null, incomingPromptKey=null;
+const revengeDeathTimers=Object.create(null);
 let auctionCategory='all';
 let hostScoresVisible=false;
 const AUCTION_CATEGORIES=[
@@ -152,6 +214,7 @@ const ITEMS=[
 {id:'meme14',name:"ມີມ: ເລັ່ງມືແນ່!",icon:"🚀",desc:'ສົ່ງມີມເຕັມຈໍຂອງທີມເປົ້າໝາຍ 7 ວິນາທີ',kind:'attack',value:'meme'},
 {id:'meme15',name:"ມີມ: ເກັ່ງຫຼາຍຖ້າຕອບໄດ້!",icon:"🏆",desc:'ສົ່ງມີມເຕັມຈໍຂອງທີມເປົ້າໝາຍ 7 ວິນາທີ',kind:'attack',value:'meme'},
 {id:'reflect',name:'ເກາະສະທ້ອນ',icon:'🪞',desc:'ສະທ້ອນການໂຈມຕີກັບຄືນ',kind:'armor',value:'reflect'},
+{id:'scatterarmor',name:'ເກາະເພັດເຈັດສີ',icon:'💎',desc:'ປ້ອງກັນຕົນເອງ ແລະ ສະທ້ອນອາວຸດໄປໃສ່ອີກ 3 ທີມ',kind:'armor',value:'scatterarmor'},
 {id:'shield',name:'ເກາະປ້ອງກັນ',icon:'🛡️',desc:'ປ້ອງກັນການໂຈມຕີ 1 ຄັ້ງ',kind:'armor',value:'shield'},
 {id:'half',name:'ຕັດຕົວເລືອກ',icon:'✂️',desc:'ເຫຼືອ 2 ຕົວເລືອກ 3 ຄຳຖາມ',kind:'weapon',value:'half'},
 {id:'virus',name:'ສົ່ງໄວຣັສ',icon:'🦠',desc:'ເອັບເຟັກໄວຣັສ 7 ວິນາທີ',kind:'attack',value:'virus'},
@@ -163,13 +226,14 @@ const ITEMS=[
 {id:'boardwipe',name:'ລ້າງກະດານ',icon:'🧹',desc:'ລ້າງຄະແນນ ແລະເລີ່ມຄຳຖາມໃໝ່',kind:'weapon',value:'boardwipe'},
 {id:'cut',name:'ຕັດຊອຍ',icon:'🔪',desc:'ຕັດຄຳຕອບຜິດ 2 ຕົວເລືອກ 1 ຂໍ້',kind:'weapon',value:'cut'},
 {id:'aura',name:'ເພີ່ມບາລະມີ',icon:'✨',desc:'ເພີ່ມຄະແນນຕົນເອງ 1',kind:'weapon',value:'aura'},
-{id:'steal',name:'ລັກສະເບຽງ',icon:'🤑',desc:'ຂະໂມຍ 1 ຄະແນນຈາກແຕ່ລະທີມ',kind:'weapon',value:'steal'},
+{id:'steal',name:'ລັກສະບຽງ',icon:'🤑',desc:'ຂະໂມຍ 1 ຄະແນນຈາກແຕ່ລະທີມ',kind:'weapon',value:'steal'},
 {id:'heartbox',name:'ບີບກ່ອງດວງໃຈ',icon:'🎁',desc:'ເບິ່ງໄອເທັມສັດຕູ ແລະຂະໂມຍ 1 ອັນ',kind:'attack',value:'heartbox'},
 {id:'double',name:'ດັບເບິນດຣາເມດ',icon:'🔋',desc:'ເພີ່ມການໃຊ້ໄອເທັມ 1 ອັນອີກ 1 ຄັ້ງ',kind:'weapon',value:'double'},
 {id:'parallel',name:'ໂລກຄູ່ຂະໜານ',icon:'🪐',desc:'ສະຫຼັບຄະແນນກັບທີມເປົ້າໝາຍ',kind:'attack',value:'parallel'},
 {id:'poison',name:'ຄຳຖາມພິດ',icon:'☠️',desc:'ສັດຕູຕອບຖືກ −1 ຄະແນນ, ຜິດ −2',kind:'attack',value:'poison'},
 {id:'god',name:'ໂກງພະເຈົ້າ',icon:'👑',desc:'ຄະແນນເທົ່າກັບທີມຄະແນນສູງສຸດ',kind:'weapon',value:'god'},
 {id:'zombie',name:'ຊອມບີ້',icon:'🧟',desc:'ເອົາໄອເທັມທີ່ເຄີຍໃຊ້ຄືນ 1 ອັນ',kind:'weapon',value:'zombie'},
+{id:'revengekill',name:'ແກ້ແຄ້ນຢ່າງສາສົມ',icon:'⚖️',desc:'ເມື່ອທີມອື່ນໃຊ້ ສັງຫານໂຫດ ໃສ່ທ່ານ ທີມຜູ້ສົ່ງຈະຖືກສັງຫານນຳ',kind:'special',value:'revengekill'},
 ];
 const REMOVED_ITEM_IDS=['penalty','pick','heaven','hellheart'];
 const SAMPLE_QUESTIONS=[
@@ -495,10 +559,70 @@ function initFirebase(){try{if(!firebase.apps.length)firebase.initializeApp(fire
 initFirebase();
 function showOnly(id){['home','hostLobby','playerJoin','hostAuction','playerAuction','hostGame','playerGame'].forEach(x=>$(x).classList.toggle('hidden',x!==id))}
 function chooseRole(r){role=r;if(!db){alert('Firebase ຍັງບໍ່ພ້ອມ. ກວດ databaseURL ແລະ Firebase Rules.');return}if(r==='host')createRoom();else showOnly('playerJoin')}
-function backHome(){clearInterval(gameTick);if(roomRef&&unsub)roomRef.off('value',unsub);role=null;roomId=null;playerId=null;state=null;showOnly('home')}
+function backHome(){clearInterval(gameTick);if(roomRef&&unsub)roomRef.off('value',unsub);role=null;roomId=null;playerId=null;state=null;isJoiningRoom=false;const joinBtn=$('joinRoomBtn');if(joinBtn){joinBtn.disabled=false;joinBtn.textContent='ເຂົ້າຫ້ອງ'}$('joinError').textContent='';showOnly('home')}
 function createRoom(){roomId=String(Math.floor(1000+Math.random()*9000));playerId='host';roomRef=db.ref('showRooms/'+roomId);roomRef.set({hostId:'host',phase:'lobby',players:{},teams:{},game:{round:0,question:null,endsAt:0,answered:{},effects:{},usedItems:[]},questions:SAMPLE_QUESTIONS,createdAt:Date.now()}).then(()=>{ $('roomCode').textContent=roomId;showOnly('hostLobby');listenRoom();}).catch(e=>alert('ສ້າງຫ້ອງບໍ່ສຳເລັດ: '+e.message))}
 function listenRoom(){if(!roomRef)return;unsub=s=>{state=s.val();if(!state)return;if(role==='host'&&state.teams){const cleanup={};Object.entries(state.teams).forEach(([id,t])=>{const inv=t.inventory||[];const clean=inv.filter(it=>!REMOVED_ITEM_IDS.includes(it.id));if(clean.length!==inv.length)cleanup['teams/'+id+'/inventory']=clean});if(Object.keys(cleanup).length)roomRef.update(cleanup).catch(err=>console.warn('cleanup removed items',err));}renderAll()};roomRef.on('value',unsub)}
-function joinRoom(){const code=$('joinCode').value.trim(),name=$('playerName').value.trim();if(!/^\d{4}$/.test(code)||!name){$('joinError').textContent='ກະລຸນາໃສ່ລະຫັດ 4 ຕົວ ແລະຊື່';return}roomId=code;roomRef=db.ref('showRooms/'+roomId);roomRef.once('value').then(s=>{const v=s.val();if(!v){$('joinError').textContent='ບໍ່ພົບຫ້ອງນີ້';return}const players=v.players||{};if(Object.keys(players).length>=4){$('joinError').textContent='ຫ້ອງເຕັມ 4 ທີມແລ້ວ';return}if(v.phase!=='lobby'){$('joinError').textContent='ເກມເລີ່ມແລ້ວ';return}playerId='p'+Math.random().toString(36).slice(2,8);const idx=Object.keys(players).length+1;roomRef.child('players/'+playerId).set({id:playerId,name,team:idx,joinedAt:Date.now()}).then(()=>{role='player';listenRoom();showOnly('playerJoin');});}).catch(e=>$('joinError').textContent=e.message)}
+function joinRoom(){
+ if(isJoiningRoom)return; // A fast double-click must not send a second join request.
+ const code=$('joinCode').value.trim(),name=$('playerName').value.replace(/\s+/g,' ').trim();
+ $('joinError').textContent='';
+ if(!/^\d{4}$/.test(code)||!name){$('joinError').textContent='ກະລຸນາໃສ່ລະຫັດ 4 ຕົວ ແລະຊື່';return}
+ if(!db){$('joinError').textContent='Firebase ຍັງບໍ່ພ້ອມ';return}
+ isJoiningRoom=true;
+ const joinBtn=$('joinRoomBtn');if(joinBtn){joinBtn.disabled=true;joinBtn.textContent='ກຳລັງເຂົ້າຫ້ອງ…'}
+ roomId=code;roomRef=db.ref('showRooms/'+roomId);
+ const joiningRoomRef=roomRef;
+ // Allocate one stable Firebase key; the transaction below assigns exactly one free team slot.
+ const newPlayerId=joiningRoomRef.child('players').push().key;
+ let rejection='';
+ const failJoin=message=>{ $('joinError').textContent=message;isJoiningRoom=false;if(joinBtn){joinBtn.disabled=false;joinBtn.textContent='ເຂົ້າຫ້ອງ'} };
+ joiningRoomRef.once('value').then(s=>{
+  const v=s.val();
+  if(!v){failJoin('ບໍ່ພົບຫ້ອງນີ້');return null}
+  if(v.phase!=='lobby'){failJoin('ເກມເລີ່ມແລ້ວ');return null}
+  const joinedAt=Date.now();
+  return joiningRoomRef.child('players').transaction(current=>{
+   rejection='';
+   const raw=current||{};
+   // Repair old rooms too: collapse duplicate team names and compact team numbers 1-4.
+   // Keep the earliest entry for each name, so a former double-click cannot occupy two slots.
+   const sortedEntries=Object.entries(raw).sort((a,b)=>{
+    const byTime=Number(a[1]?.joinedAt||0)-Number(b[1]?.joinedAt||0);
+    return byTime||(Number(a[1]?.team||99)-Number(b[1]?.team||99))||String(a[0]).localeCompare(String(b[0]));
+   });
+   const players={},seenNames=new Set();
+   for(const [id,p] of sortedEntries){
+    const displayName=String(p?.name||'').replace(/\s+/g,' ').trim();
+    const normalized=displayName.toLocaleLowerCase();
+    if(normalized&&seenNames.has(normalized))continue;
+    if(normalized)seenNames.add(normalized);
+    const teamNumber=Object.keys(players).length+1;
+    players[id]={...p,id:p?.id||id,name:displayName,team:teamNumber};
+   }
+   const entries=Object.entries(players);
+   const normalizedName=name.toLocaleLowerCase();
+   if(entries.some(([,p])=>String(p?.name||'').replace(/\s+/g,' ').trim().toLocaleLowerCase()===normalizedName)){
+    rejection='duplicate';return players;
+   }
+   if(entries.length>=4){rejection='full';return players;}
+   return {...players,[newPlayerId]:{id:newPlayerId,name,team:entries.length+1,joinedAt}};
+  });
+ }).then(result=>{
+  if(!result)return;
+  const committed=!!result.committed;
+  const players=result.snapshot?.val()||{};
+  const joined=players[newPlayerId];
+  if(!committed||!joined){
+   if(rejection==='duplicate'||Object.values(players).some(p=>String(p?.name||'').replace(/\s+/g,' ').trim().toLocaleLowerCase()===name.toLocaleLowerCase()))failJoin('ຊື່ທີມນີ້ເຂົ້າຫ້ອງແລ້ວ. ກະລຸນາໃຊ້ຊື່ທີ່ບໍ່ຊ້ຳກັນ');
+   else if(rejection==='full'||Object.keys(players).length>=4)failJoin('ຫ້ອງເຕັມ 4 ທີມແລ້ວ');
+   else failJoin('ເຂົ້າຫ້ອງບໍ່ສຳເລັດ. ກະລຸນາລອງໃໝ່');
+   return;
+  }
+  playerId=newPlayerId;role='player';
+  if(joinBtn){joinBtn.disabled=true;joinBtn.textContent='ເຂົ້າຫ້ອງແລ້ວ'}
+  listenRoom();showOnly('playerJoin');
+ }).catch(e=>failJoin('ເຂົ້າຫ້ອງບໍ່ສຳເລັດ: '+(e?.message||e)));
+}
 function playersList(){return Object.entries(state?.players||{}).sort((a,b)=>a[1].team-b[1].team)}
 function teamById(id){return state?.players?.[id]}
 function renderLobby(){const ps=playersList();$('lobbyPlayers').innerHTML=[1,2,3,4].map(n=>{const p=ps.find(x=>x[1].team===n);return `<div class="player"><b>ທີມ ${n}</b><p>${p?esc(p[1].name):'<span class="muted">ລໍຖ້າຜູ້ຫຼິ້ນ…</span>'}</p><span class="pill">${p?'ເຂົ້າແລ້ວ':'ວ່າງ'}</span></div>`}).join('');$('startGame').disabled=ps.length!==4}
@@ -513,7 +637,7 @@ function backToLobby(){if(role==='host'&&state?.phase==='auction')roomRef.update
 function renderMoneyWallet(targetId,team,label){
  const target=$(targetId);if(!target||!team)return;
  const balance=Math.max(0,Number(team.money??100));const pct=Math.max(0,Math.min(100,balance));
- target.innerHTML=`<div class="wallet-line"><b>💰 ${esc(label||('ທີມ '+team.team+' • '+team.name))}</b><strong class="wallet-value">${balance} / 100 ເຫຼຽນ</strong></div><div class="money-track"><div class="money-fill ${pct<=20?'low':''}" style="width:${pct}%"></div></div>`;
+ target.innerHTML=`<div class="wallet-line"><b>💰 ${esc(label||('ທີມ '+team.team+' • '+team.name))}</b><strong class="wallet-value">${balance} / 100 ຫຼຽນ</strong></div><div class="money-track"><div class="money-fill ${pct<=20?'low':''}" style="width:${pct}%"></div></div>`;
 }
 function renderAuctionItems(targetId){
  const target=$(targetId);if(!target)return;const playerView=targetId==='playerAuctionItems';
@@ -530,9 +654,9 @@ function renderAuctionItems(targetId){
   const canBid=playerView&&role==='player'&&active&&balance>=bidCost;
   const leader=bid.bidderId?(state.players?.[bid.bidderId]||state.teams?.[bid.bidderId]):null;
   const leaderLabel=bid.bidderId?`ທີມທີ່ນຳປະມູນ: ທີມ ${leader?.team??bid.team??'?'} ${esc(leader?.name||bid.playerName||'')}`:'ຍັງບໍ່ມີຜູ້ປະມູນ';
-  const btn=playerView?`<button class="buy-item" ${canBid?'':'disabled'} onclick="buyAuctionItem('${it.id}')">${!active?'⛔ ປິດປະມູນ':balance<bidCost?'💸 ເຫຼຽນບໍ່ພໍ':`🔨 ປະມູນ ${nextPrice} 🪙 (ເສຍ ${bidCost})`}</button>`:'';
+  const btn=playerView?`<button class="buy-item" ${canBid?'':'disabled'} onclick="buyAuctionItem('${it.id}')">${!active?'⛔ ປິດປະມູນ':balance<bidCost?'💸 ຫຼຽນບໍ່ພໍ':`🔨 ປະມູນ ${nextPrice} 🪙 (ເສຍ ${bidCost})`}</button>`:'';
   const preview=it.questionData?`<div class="qtext">${esc(it.questionData.question)}</div><div class="choices">${(it.questionData.choices||[]).map((c,i)=>`<div class="choice">${'ABCD'[i]||i+1}. ${esc(c)}</div>`).join('')}</div>`:`<p class="muted">${esc(it.desc||'')}</p>`;
-  return `<div class="item ${it.questionData?'question-auction':''}"><div style="font-size:30px">${it.icon}</div><h3>${esc(it.name)}</h3>${preview}<div class="price-line"><span>ລາຄາປະມູນສູງສຸດ</span><strong class="price-number">${currentPrice} 🪙</strong></div><p class="small muted">${leaderLabel}</p><p class="small muted">ລາຄາຄັ້ງຕໍ່ໄປ: ${nextPrice} ເຫຼຽນ • ກົດຄັ້ງນີ້ເສຍ ${bidCost} ເຫຼຽນ • ເງິນທີ່ຈ່າຍແລ້ວບໍ່ຄືນ • ໄອເທັມນີ້ມີພຽງ 1 ອັນ</p>${btn}</div>`;
+  return `<div class="item ${it.questionData?'question-auction':''}"><div style="font-size:30px">${it.icon}</div><h3>${esc(it.name)}</h3>${preview}<div class="price-line"><span>ລາຄາປະມູນສູງສຸດ</span><strong class="price-number">${currentPrice} 🪙</strong></div><p class="small muted">${leaderLabel}</p><p class="small muted"></p>${btn}</div>`;
  }).join('');if(window.MathJax&&typeof MathJax.typesetPromise==='function')MathJax.typesetPromise([target]).catch(()=>{});
 }
 
@@ -546,7 +670,7 @@ function renderAuctionDashboard(view){
  if(board)board.innerHTML=playersList().map(([id,p])=>{const t=state.teams?.[id]||{money:100,team:p.team,name:p.name};const balance=Math.max(0,Number(t.money??100));const pct=Math.min(100,balance);return `<div class="wallet-card"><div class="wallet-line"><b>ທີມ ${p.team}: ${esc(p.name)}</b><strong>${balance} 🪙</strong></div><div class="money-track"><div class="money-fill ${pct<=20?'low':''}" style="width:${pct}%"></div></div></div>`}).join('');
  const event=auction.lastPurchase;
  const item=event?ITEMS.find(it=>it.id===event.itemId):null;
- const eventText=event?`🔨 ທີມ ${event.team}: ${esc(event.playerName||'')} ປະມູນ ${esc(item?.name||(String(event.itemId).startsWith('question_')?'ຄຳຖາມ '+(Number(String(event.itemId).slice(9))+1):event.itemId))} ສູງສຸດ ${Number(event.price)||0} ເຫຼຽນ`:'ລາຄາປະມູນສູງສຸດຈະສະແດງຢູ່ບ່ອນນີ້';
+ const eventText=event?`🔨 ທີມ ${event.team}: ${esc(event.playerName||'')} ປະມູນ ${esc(item?.name||(String(event.itemId).startsWith('question_')?'ຄຳຖາມ '+(Number(String(event.itemId).slice(9))+1):event.itemId))} ສູງສຸດ ${Number(event.price)||0} ຫຼຽນ`:'ລາຄາປະມູນສູງສຸດຈະສະແດງຢູ່ບ່ອນນີ້';
  const eventBox=$(view==='host'?'hostAuctionEvent':'playerAuctionEvent');if(eventBox)eventBox.innerHTML=eventText;
  if(view==='player')renderMoneyWallet('playerAuctionWallet',state.teams?.[playerId],'💰 ເງິນຂອງທ່ານ');
 }
@@ -599,9 +723,9 @@ function buyAuctionItem(itemId){
   current.auction=auction;return current;
  },(error,committed,snapshot)=>{
   if(error){showAuctionMessage('ປະມູນບໍ່ສຳເລັດ: '+error.message);return;}
-  if(!committed){showAuctionMessage('ປະມູນບໍ່ໄດ້: ເຫຼຽນບໍ່ພໍ ຫຼື ໝົດເວລາ');return;}
+  if(!committed){showAuctionMessage('ປະມູນບໍ່ໄດ້: ຫຼຽນບໍ່ພໍ ຫຼື ໝົດເວລາ');return;}
   const latest=snapshot.val()?.auction?.lastPurchase;
-  if(latest)showAuctionMessage(`🔨 ປະມູນສຳເລັດ • ຈ່າຍເງິນທັນທີ ${latest.bidderId===playerId?'ແລ້ວ':''} • ລາຄາສູງສຸດ ${latest.price} ເຫຼຽນ • ເງິນທີ່ຈ່າຍແລ້ວບໍ່ຄືນ`);
+  if(latest)showAuctionMessage(`🔨 ປະມູນສຳເລັດ • ຈ່າຍເງິນທັນທີ ${latest.bidderId===playerId?'ແລ້ວ':''} • ລາຄາສູງສຸດ ${latest.price} ຫຼຽນ • ເງິນທີ່ຈ່າຍແລ້ວບໍ່ຄືນ`);
  });
 }
 function showAuctionMessage(message){const el=$('playerAuctionEvent');if(el)el.textContent=message;}
@@ -633,7 +757,9 @@ function advanceTeamQuestion(id,choice,expired=false){
   const now=Date.now();if(expired&&now<deadline)return;if(!expired&&now>=deadline)return;
   const q=g.questionByTeam[id],correct=!expired&&choice===q.answer;let score=Number(t.score||0);
   const fx=g.effects?.[id]||{};
-  if(fx.pick){if(correct)fx.won=true;else t.alive=false;delete fx.pick}
+  // ເມື່ອໝົດເວລາ ຂໍ້ນີ້ໄດ້ 0 ຄະແນນ: ບໍ່ເພີ່ມ ຫຼື ຫັກຄະແນນ ແລະບໍ່ໃຫ້ເອັບເຟັກຄະແນນຂອງໄອເທັມເຮັດວຽກໃນຂໍ້ນີ້.
+  if(expired){ /* score remains unchanged; consume one-question effects without applying score changes */ delete fx.pick; delete fx.poison; if(t.heaven>0)t.heaven--; if(t.hellheart>0)t.hellheart--; }
+  else if(fx.pick){if(correct)fx.won=true;else t.alive=false;delete fx.pick}
   else if(fx.poison){score+=correct?-1:-2;delete fx.poison}
   else if(t.heaven>0){score+=correct?2:1;t.heaven--}
   else if(t.hellheart>0){score+=correct?-1:-2;t.hellheart--}
@@ -652,7 +778,7 @@ function advanceTeamQuestion(id,choice,expired=false){
  },(err)=>{if(err)console.warn('Question update failed:',err)});
 }
 function answerQuestion(choice){if(role==='player')advanceTeamQuestion(playerId,choice,false)}
-function renderPlayerQuestion(){const team=state.teams?.[playerId];if(!team)return;renderMoneyWallet('myGameWallet',team,'💰 ເງິນທີມ');$('myTeamTitle').textContent=`🎮 ທີມ ${team.team}: ${team.name}`;$('myScore').textContent=`ຄະແນນ ${team.score}`;$('myRound').textContent=`ຮອບ ${Math.min(15,Number(team.answered||0)+1)}/15`;const q=state.game?.questionByTeam?.[playerId];const lastAnswer=state.game?.answered?.[playerId];const answered=lastAnswer&&Number(lastAnswer.index)===Number(team.answered||0)?lastAnswer:null;const effect=state.game?.effects?.[playerId]||{};const notice=effect.notice;const noticeHTML=notice?`<div class="notice" style="border:2px solid ${notice.lost?'var(--red)':'var(--gold)'};background:${notice.lost?'#511c32':'#302a4f'}"><div style="font-size:clamp(20px,4vw,32px);font-weight:900">${esc(notice.title||'')}</div><p>${esc(notice.detail||'')}</p>${notice.lost?'<div class="big dangertext">❌ ທ່ານແພ້ແລ້ວ</div>':''}</div>`:'';if(!team.alive){const by=effect.eliminatedBy;const killer=by?`<div class="notice" style="border:2px solid var(--red);background:#511c32"><div class="big">💀 ທ່ານຖືກສັງຫານໂຫດ!</div><h2>❌ ທ່ານແພ້ແລ້ວ</h2><p>ຟັງຊັນ: ${esc(ITEMS.find(x=>x.id===by.itemId)?.name||by.itemName||by.itemId||'ບໍ່ຮູ້')}</p><p>ທີມທີ່ສົ່ງມາ: ${esc(by.fromName||'ບໍ່ຮູ້')}</p></div>`:noticeHTML;$('myQuestion').innerHTML=killer;return}if(state.phase==='countdown'){$('myQuestion').innerHTML='<div class="qtext">ເຕັມພ້ອມ… ເກມຈະເລີ່ມໃນໄວໆນີ້!</div>';return}if(!q){$('myQuestion').innerHTML=team.answered>=15?'<h2>✅ ຕອບຄົບ 15 ຂໍ້ແລ້ວ</h2><p>⏳ ລໍຖ້າທີມອື່ນຕອບໃຫ້ຄົບ</p>':'<h2>ລໍຖ້າຄຳຖາມຈາກຜູ້ຄຸມ…</h2>';return}let choices=q.choices||[];const halfKey='halfChoices_'+(team.answered||0);const stored=effect[halfKey];if(stored&&Array.isArray(stored))choices=stored;else if(team.halfLeft>0&&choices.length>2){const wrong=choices.filter(c=>c!==q.answer);choices=[q.answer,...wrong.sort(()=>Math.random()-.5).slice(0,1)];roomRef.child('game/effects/'+playerId+'/'+halfKey).set(choices);roomRef.child('teams/'+playerId+'/halfLeft').set(Math.max(0,team.halfLeft-1));}const disabled=!!answered||!team.alive||Date.now()>=Number(state.game?.deadlines?.[playerId]||0);$('myQuestion').innerHTML=`${noticeHTML}<div class="between"><span class="pill">ຄຳຖາມ ${Math.min(15,(team.answered||0)+1)}/15</span><span class="pill">${answered?(answered.correct?'ຕອບຖືກ':'ຕອບຜິດ'):'ເລືອກຄຳຕອບ'}</span></div><div class="qtext">${q.question}</div><div class="choices">${choices.map((c,i)=>`<button class="choice" ${disabled?'disabled':''} onclick="answerQuestion(${JSON.stringify(c).replace(/"/g,'&quot;')})">${String.fromCharCode(65+i)}. ${c}</button>`).join('')}</div>${answered?`<div class="notice">${answered.correct?'✅ ຖືກຕ້ອງ!':'❌ ຜິດ!'} ${!team.alive?'<b class="dangertext">ທີມທ່ານແພ້ແລ້ວ</b>':''}</div>`:''}`;if(window.MathJax)MathJax.typesetPromise([$ ('myQuestion')]).catch(()=>{})}
+function renderPlayerQuestion(){const team=state.teams?.[playerId];if(!team)return;if(state.phase==='finished'){$('modalRoot').innerHTML='';$('myQuestion').innerHTML='<div style="text-align:center;padding:45px 12px"><div style="font-size:65px">🏁</div><h1>ເກມຈົບແລ້ວ</h1></div>';return;}renderMoneyWallet('myGameWallet',team,'💰 ເງິນທີມ');$('myTeamTitle').textContent=`🎮 ທີມ ${team.team}: ${team.name}`;$('myScore').textContent=`ຄະແນນ ${team.score}`;$('myRound').textContent=`ຮອບ ${Math.min(15,Number(team.answered||0)+1)}/15`;const q=state.game?.questionByTeam?.[playerId];const lastAnswer=state.game?.answered?.[playerId];const answered=lastAnswer&&Number(lastAnswer.index)===Number(team.answered||0)?lastAnswer:null;const effect=state.game?.effects?.[playerId]||{};const notice=effect.notice;const noticeHTML=notice?`<div class="notice" style="border:2px solid ${notice.lost?'var(--red)':'var(--gold)'};background:${notice.lost?'#511c32':'#302a4f'}"><div style="font-size:clamp(20px,4vw,32px);font-weight:900">${esc(notice.title||'')}</div><p>${esc(notice.detail||'')}</p>${notice.lost?'<div class="big dangertext">❌ ທ່ານແພ້ແລ້ວ</div>':''}</div>`:'';if(!team.alive){const by=effect.eliminatedBy;const killer=by?`<div class="notice" style="border:2px solid var(--red);background:#511c32"><div class="big">💀 ທ່ານຖືກສັງຫານໂຫດ!</div><h2>❌ ທ່ານແພ້ແລ້ວ</h2><p>ຟັງຊັນ: ${esc(ITEMS.find(x=>x.id===by.itemId)?.name||by.itemName||by.itemId||'ບໍ່ຮູ້')}</p><p>ທີມທີ່ສົ່ງມາ: ${esc(by.fromName||'ບໍ່ຮູ້')}</p></div>`:noticeHTML;$('myQuestion').innerHTML=killer;return}if(state.phase==='countdown'){$('myQuestion').innerHTML='<div class="qtext">ກຽມພ້ອມ… ເກມຈະເລີ່ມໃນໄວໆນີ້!</div>';return}if(!q){$('myQuestion').innerHTML=team.answered>=15?'<h2>✅ ຕອບຄົບ 15 ຂໍ້ແລ້ວ</h2><p>⏳ ລໍຖ້າທີມອື່ນຕອບໃຫ້ຄົບ</p>':'<h2>ລໍຖ້າຄຳຖາມຈາກຜູ້ຄຸມ…</h2>';return}let choices=q.choices||[];const halfKey='halfChoices_'+(team.answered||0);const stored=effect[halfKey];if(stored&&Array.isArray(stored))choices=stored;else if(team.halfLeft>0&&choices.length>2){const wrong=choices.filter(c=>c!==q.answer);choices=[q.answer,...wrong.sort(()=>Math.random()-.5).slice(0,1)];roomRef.child('game/effects/'+playerId+'/'+halfKey).set(choices);roomRef.child('teams/'+playerId+'/halfLeft').set(Math.max(0,team.halfLeft-1));}const disabled=!!answered||!team.alive||effect.revengeKillPendingDeath===true||Date.now()>=Number(state.game?.deadlines?.[playerId]||0);$('myQuestion').innerHTML=`${noticeHTML}<div class="between"><span class="pill">ຄຳຖາມ ${Math.min(15,(team.answered||0)+1)}/15</span><span class="pill">${answered?(answered.correct?'ຕອບຖືກ':'ຕອບຜິດ'):'ເລືອກຄຳຕອບ'}</span></div><div class="qtext">${q.question}</div><div class="choices">${choices.map((c,i)=>`<button class="choice" ${disabled?'disabled':''} onclick="answerQuestion(${JSON.stringify(c).replace(/"/g,'&quot;')})">${String.fromCharCode(65+i)}. ${c}</button>`).join('')}</div>${answered?`<div class="notice">${answered.correct?'✅ ຖືກຕ້ອງ!':'❌ ຜິດ!'} ${!team.alive?'<b class="dangertext">ທີມທ່ານແພ້ແລ້ວ</b>':''}</div>`:''}`;if(window.MathJax)MathJax.typesetPromise([$ ('myQuestion')]).catch(()=>{})}
 function renderInventory(){const team=state.teams?.[playerId];if(!team)return;const completed=Number(team.answered||0)>=15;const blocked=completed||!team.alive||state.phase!=='game';const items=(team.inventory||[]).map((it,i)=>({it,i})).filter(({it})=>!REMOVED_ITEM_IDS.includes(it.id)).map(({it,i})=>{const meta=ITEMS.find(x=>x.id===it.id)||{name:it.id,icon:'🎁',desc:''};return `<button class="secondary" ${blocked?'disabled':''} title="${completed?'ຕອບຄົບ 15 ຂໍ້ແລ້ວ ບໍ່ສາມາດໃຊ້ໄອເທັມໄດ້':!team.alive?'ທີມຖືກຄັດອອກ':state.phase!=='game'?'ຍັງບໍ່ແມ່ນເວລາໃຊ້ໄອເທັມ':''}" onclick="useItem(${i})">${meta.icon} ${meta.name} <span class="pill">x${it.charges||1}</span></button>`}).join('');$('myInventory').innerHTML=(completed?'<div class="notice" style="border-color:var(--gold)">🔒 ທ່ານຕອບຄົບ 15 ຂໍ້ແລ້ວ — ລະບົບລັອກການໃຊ້ໄອເທັມທັງໝົດ</div>':'')+(items||'<span class="muted">ຍັງບໍ່ມີໄອເທັມ</span>')}
 // Shared button-based modal for targeting teams and selecting inventory items.
 function closeModal(){const root=$('modalRoot');if(root)root.innerHTML='';}
@@ -672,7 +798,7 @@ function showChoiceModal(title,options,onSelect){
  const cancel=document.createElement('button');cancel.className='secondary';cancel.textContent='✕ ຍົກເລີກ';cancel.addEventListener('click',closeModal);panel.appendChild(cancel);
  overlay.addEventListener('click',e=>{if(e.target===overlay)closeModal()});overlay.appendChild(panel);root.appendChild(overlay);
 }
-function useItem(index){const team=state.teams?.[playerId];if(!team)return;if(Number(team.answered||0)>=15){closeModal();renderInventory();alert('🔒 ທ່ານຕອບຄົບ 15 ຂໍ້ແລ້ວ ບໍ່ສາມາດໃຊ້ໄອເທັມໄດ້');return}if(!team.alive||state.phase!=='game')return;if(!team.inventory?.[index])return;const inv=team.inventory[index],meta=ITEMS.find(x=>x.id===inv.id);if(!meta)return;roomRef.child('game/effects/'+playerId+'/notice').set({id:Date.now(),title:`✨ ກຳລັງໃຊ້ຟັງຊັນ: ${meta.name}`,detail:`ທີມ ${team.team}: ${team.name} ກຳລັງໃຊ້ ${meta.name}`,itemId:inv.id,from:playerId,at:Date.now(),lost:false});pushGameNotice({from:playerId,itemId:inv.id,itemName:meta.name,status:'✨ ກຳລັງໃຊ້',kind:'function',message:`ທີມ ${team.team}: ${team.name} ເລີ່ມໃຊ້ຟັງຊັນ ${meta.name}`});if(meta.kind==='armor'){alert('🛡️ ເກາະຈະປ້ອງກັນອັດຕະໂນມັດເມື່ອຖືກໂຈມຕີ');return}let target=null;if(meta.kind==='attack'||['parallel','heartbox','poison','timeminus3','timeminus5','timeminus7','timeminus10','kill','meme','virus','sandstorm','meteor','flip','blink'].includes(inv.id)){const opts=Object.entries(state.teams).filter(([id,t])=>id!==playerId&&t.alive).map(([id,t])=>({id,name:`ທີມ ${t.team}: ${t.name}`}));if(!opts.length){alert('ບໍ່ມີທີມເປົ້າໝາຍ');return}showChoiceModal('🎯 ເລືອກທີມເປົ້າໝາຍ',opts.map(o=>({label:o.name,value:o.id})),id=>useItemTarget(index,id));return}
+function useItem(index){const team=state.teams?.[playerId];if(!team)return;if(Number(team.answered||0)>=15){closeModal();renderInventory();alert('🔒 ທ່ານຕອບຄົບ 15 ຂໍ້ແລ້ວ ບໍ່ສາມາດໃຊ້ໄອເທັມໄດ້');return}if(!team.alive||state.phase!=='game')return;if(!team.inventory?.[index])return;const inv=team.inventory[index],meta=ITEMS.find(x=>x.id===inv.id);if(!meta)return;roomRef.child('game/effects/'+playerId+'/notice').set({id:Date.now(),title:`✨ ກຳລັງໃຊ້ຟັງຊັນ: ${meta.name}`,detail:`ທີມ ${team.team}: ${team.name} ກຳລັງໃຊ້ ${meta.name}`,itemId:inv.id,from:playerId,at:Date.now(),lost:false});pushGameNotice({from:playerId,itemId:inv.id,itemName:meta.name,status:'✨ ກຳລັງໃຊ້',kind:'function',message:`ທີມ ${team.team}: ${team.name} ເລີ່ມໃຊ້ຟັງຊັນ ${meta.name}`});if(meta.kind==='armor'){alert('🛡️ ເກາະຈະປ້ອງກັນອັດຕະໂນມັດເມື່ອຖືກໂຈມຕີ');return}if(inv.id==='revengekill'){roomRef.child('game/effects/'+playerId).update({revengeKillArmed:true,revengeKillArmedAt:Date.now(),revengeKillPendingDeath:false,revengeKillAttackerDeathConfirmed:false}).then(()=>consumeItem(index)).then(()=>pushGameNotice({from:playerId,itemId:inv.id,itemName:meta.name,status:'⚖️ ເປີດໃຊ້ແລ້ວ',kind:'function',message:`ທີມ ${team.team}: ${team.name} ເປີດໃຊ້ ແກ້ແຄ້ນຢ່າງສາສົມ — ຖ້າຖືກ ສັງຫານໂຫດ ຜູ້ສົ່ງຈະຖືກສັງຫານນຳ`}));return}let target=null;if(meta.kind==='attack'||['parallel','heartbox','poison','timeminus3','timeminus5','timeminus7','timeminus10','kill','meme','virus','sandstorm','meteor','flip','blink'].includes(inv.id)){const opts=Object.entries(state.teams).filter(([id,t])=>id!==playerId&&t.alive).map(([id,t])=>({id,name:`ທີມ ${t.team}: ${t.name}`}));if(!opts.length){alert('ບໍ່ມີທີມເປົ້າໝາຍ');return}showChoiceModal('🎯 ເລືອກທີມເປົ້າໝາຍ',opts.map(o=>({label:o.name,value:o.id})),id=>useItemTarget(index,id));return}
 if(inv.id.startsWith('timeplus')){
  const seconds=Number(inv.id.replace('timeplus',''))||3;
  roomRef.update({['teams/'+playerId+'/extraTime']:(team.extraTime||0)+seconds,...(state.phase==='game'&&state.game?.deadlines?.[playerId]?{['game/deadlines/'+playerId]:state.game.deadlines[playerId]+seconds*1000}:{})}).then(()=>consumeItem(index));return;
@@ -694,44 +820,82 @@ function updateScore(id,delta){roomRef.child('teams/'+id+'/score').set((state.te
 function consumeItem(index){const team=state.teams?.[playerId];if(!team)return;const inv=[...team.inventory],used=inv[index];if(!used)return;const charges=(used.charges||1)-1;if(charges<=0)inv.splice(index,1);else inv[index]={...used,charges};roomRef.update({['teams/'+playerId+'/inventory']:inv,['game/usedItems']:[...(state.game?.usedItems||[]),used.id]})}
 function applyAttack(itemId,from,to){
  const victim=state.teams?.[to];if(!victim||!victim.alive)return Promise.resolve(false);
- const armorIds=(victim.inventory||[]).filter(x=>['shield','reflect','diamondarmor','ironarmor','scatterarmor'].includes(x.id)).map(x=>x.id);
- if(armorIds.length){
-  const promptRef=roomRef.child('game/effects/'+to+'/incomingPrompt');
-  const prompt={itemId,from,armorIds:[...new Set(armorIds)],createdAt:Date.now(),expiresAt:Date.now()+5000,status:'pending'};
-  return promptRef.transaction(current=>{
-   if(current&&(current.status==='pending'||current.status==='resolving'))return;
-   return prompt;
-  }).then(result=>Promise.resolve(!!result.committed));
+ // ຢ່າງສາສົມຕ້ອງຕອບໂຕ້ທັນທີ: ຖ້າເປົ້າໝາຍເປີດໃຊ້ໄວ້ ບໍ່ສະແດງໜ້າເລືອກເກາະ ຫຼືລໍຖ້າ 5 ວິນາທີ.
+ const routeAttack=()=>{
+  const latestVictim=state.teams?.[to];if(!latestVictim||!latestVictim.alive)return Promise.resolve(false);
+  const armorIds=(latestVictim.inventory||[]).filter(x=>['shield','reflect','diamondarmor','ironarmor','scatterarmor'].includes(x.id)).map(x=>x.id);
+  const revengeAvailable=(latestVictim.inventory||[]).some(x=>x.id==='revengekill');
+  const hasChoice=armorIds.length>0|| (itemId==='kill'&&revengeAvailable);
+  if(itemId==='kill'){
+   // ສັງຫານໂຫດຈະລໍ 5 ວິນາທີ; ສະແດງຄຳເຕືອນຫຼັງ 1 ວິນາທີ.
+   const createdAt=Date.now(),promptRef=roomRef.child('game/effects/'+to+'/incomingPrompt');
+   const prompt={itemId,from,armorIds:[...new Set(armorIds)],revengeAvailable,delayedKill:true,createdAt,notBefore:createdAt+1000,expiresAt:createdAt+5000,status:'pending'};
+   return promptRef.transaction(current=>{
+    if(current&&(current.status==='pending'||current.status==='resolving'))return;
+    return prompt;
+   }).then(result=>{
+    if(!result.committed)return false;
+    // ຖ້າບໍ່ມີໄອເທັມໃຫ້ເລືອກ ໃຫ້ຄັດອອກເມື່ອຄົບ 5 ວິນາທີ.
+    if(!hasChoice)setTimeout(()=>{
+     const current=state?.game?.effects?.[to]?.incomingPrompt;
+     if(current&&Number(current.createdAt)===createdAt&&current.status==='pending')resolveIncomingAttack(null);
+    },5000);
+    return true;
+   });
+  }
+  if(armorIds.length){
+   const promptRef=roomRef.child('game/effects/'+to+'/incomingPrompt');
+   const createdAt=Date.now();
+   const prompt={itemId,from,armorIds:[...new Set(armorIds)],revengeAvailable:false,createdAt,expiresAt:createdAt+5000,status:'pending'};
+   return promptRef.transaction(current=>{if(current&&(current.status==='pending'||current.status==='resolving'))return;return prompt;}).then(result=>!!result.committed);
+  }
+  return doAttack(itemId,from,to).then(accepted=>!!accepted);
+ };
+ if(itemId==='kill'){
+  return roomRef.child('game/effects/'+to).once('value').then(snapshot=>{
+   const freshEffects=snapshot.val()||{};
+   if(freshEffects.revengeKillArmed===true)return doAttack(itemId,from,to).then(accepted=>!!accepted);
+   return routeAttack();
+  }).catch(err=>{console.error('check revengekill failed',err);throw err;});
  }
- return doAttack(itemId,from,to).then(accepted=>!!accepted);
+ return routeAttack();
 }
 function resolveIncomingAttack(armorChoice=null){
  if(role!=='player'||!playerId)return;
  const prompt=state?.game?.effects?.[playerId]?.incomingPrompt;
  if(!prompt||prompt.status!=='pending')return;
- const useArmor=typeof armorChoice==='string'&&armorChoice.length>0;
+ const useRevenge=armorChoice==='revengekill';const useArmor=typeof armorChoice==='string'&&armorChoice.length>0&&!useRevenge;
  const promptKey=String(prompt.createdAt)+':'+prompt.itemId+':'+prompt.from;
  if(incomingPromptKey&&incomingPromptKey!==promptKey)return;
  const promptRef=roomRef.child('game/effects/'+playerId+'/incomingPrompt');
- promptRef.transaction(current=>{if(!current||current.status!=='pending'||String(current.createdAt)+':'+current.itemId+':'+current.from!==promptKey)return;return {...current,status:'resolving',choice:useArmor?'armor':'take',armorId:useArmor?armorChoice:null,resolvedAt:Date.now()};}).then(result=>{
+ promptRef.transaction(current=>{if(!current||current.status!=='pending'||String(current.createdAt)+':'+current.itemId+':'+current.from!==promptKey)return;return {...current,status:'resolving',choice:useRevenge?'revenge':(useArmor?'armor':'take'),armorId:useArmor?armorChoice:null,resolvedAt:Date.now()};}).then(result=>{
   if(!result.committed)return;
   if(incomingPromptTimer){clearInterval(incomingPromptTimer);incomingPromptTimer=null;}
   incomingPromptKey=null;
   const chosen=result.snapshot.val();
   const clearPrompt=()=>promptRef.remove();
-  if(!useArmor)return clearPrompt().then(()=>doAttack(chosen.itemId,chosen.from,playerId));
+  if(useRevenge){
+    const team=state?.teams?.[playerId];const inv=[...(team?.inventory||[])];const idx=inv.findIndex(x=>x.id==='revengekill');
+    if(idx<0)return clearPrompt().then(()=>doAttack(chosen.itemId,chosen.from,playerId));
+    inv.splice(idx,1);
+    return roomRef.child('teams/'+playerId+'/inventory').set(inv)
+      .then(()=>roomRef.child('game/effects/'+playerId).update({revengeKillArmed:true,revengeKillArmedAt:Date.now(),revengeKillPendingDeath:false,revengeKillAttackerDeathConfirmed:false}))
+      .then(()=>clearPrompt()).then(()=>doAttack(chosen.itemId,chosen.from,playerId))
+      .then(()=>pushGameNotice({from:playerId,to:chosen.from,itemId:'revengekill',itemName:'ແກ້ແຄ້ນຢ່າງສາສົມ',status:'⚖️ ຕອບໂຕ້',kind:'function',message:'ທ່ານເລືອກໃຊ້ ແກ້ແຄ້ນຢ່າງສາສົມ — ທີມຜູ້ສົ່ງຈະຖືກສັງຫານນຳ'}));
+   }
+   if(!useArmor)return clearPrompt().then(()=>doAttack(chosen.itemId,chosen.from,playerId));
   const team=state?.teams?.[playerId];const inv=[...(team?.inventory||[])];const idx=inv.findIndex(x=>x.id===chosen.armorId&&['shield','reflect','diamondarmor','ironarmor','scatterarmor'].includes(x.id));
   // ຖ້າເກາະທີ່ເລືອກບໍ່ຢູ່ແລ້ວ ໃຫ້ການໂຈມຕີເຂົ້າຕາມປົກກະຕິ
   if(idx<0)return clearPrompt().then(()=>doAttack(chosen.itemId,chosen.from,playerId));
   const armor=inv.splice(idx,1)[0];
   return roomRef.child('teams/'+playerId+'/inventory').set(inv).then(()=>clearPrompt()).then(()=>{
+   const attacker=state?.teams?.[chosen.from],victim=state?.teams?.[playerId],attackMeta=ITEMS.find(x=>x.id===chosen.itemId);
    if(armor.id==='reflect'){
     // ສະທ້ອນໄອເທັມກັບຫາຜູ້ສົ່ງ; ຖ້າຜູ້ສົ່ງມີເກາະ ລາວຈະໄດ້ເລືອກປ້ອງກັນພາຍໃນ 5 ວິນາທີ
     return applyAttack(chosen.itemId,playerId,chosen.from);
    }
-   if(armor.id==='scatterarmor')return Promise.all(Object.keys(state.teams||{}).filter(id=>id!==playerId&&id!==chosen.from).map(id=>applyAttack(chosen.itemId,playerId,id)));
+   if(armor.id==='scatterarmor'){const redirected=Object.keys(state.teams||{}).filter(id=>id!==playerId&&state.teams?.[id]?.alive);return pushGameNotice({from:playerId,to:null,itemId:'scatterarmor',itemName:'ເກາະເພັດເຈັດສີ',status:'💎 ສະທ້ອນອາວຸດ',kind:'impact',message:`ທີມ ${victim?.team}: ${victim?.name} ໃຊ້ເກາະເພັດເຈັດສີ ສະທ້ອນ ${attackMeta?.name||chosen.itemId} ໄປໃສ່ອີກ ${redirected.length} ທີມ`}).then(()=>Promise.all(redirected.map(id=>applyAttack(chosen.itemId,playerId,id))));}
    // shield/diamond/iron armor: ບລັອກການໂຈມຕີຄັ້ງນີ້
-   const attacker=state?.teams?.[chosen.from],victim=state?.teams?.[playerId],attackMeta=ITEMS.find(x=>x.id===chosen.itemId);
    return pushGameNotice({from:chosen.from,to:playerId,itemId:chosen.itemId,itemName:attackMeta?.name||chosen.itemId,status:'🛡️ ປ້ອງກັນສຳເລັດ',kind:'impact',message:`ທີມ ${attacker?.team}: ${attacker?.name} ໃຊ້ ${attackMeta?.name||chosen.itemId} ໃສ່ ທີມ ${victim?.team}: ${victim?.name} ແຕ່ເກາະ ${armor.name} ບລັອກໄວ້`});
   });
  }).catch(err=>console.error('resolveIncomingAttack',err));
@@ -753,9 +917,72 @@ function renderIncomingAttackPrompt(){
  const meta=ITEMS.find(x=>x.id===prompt.itemId);const attacker=state.teams?.[prompt.from];
  const available=(prompt.armorIds||[prompt.armorId].filter(Boolean)).filter((id,i,arr)=>arr.indexOf(id)===i);
  const armorButtons=available.map(id=>{const armor=ITEMS.find(x=>x.id===id);return `<button class="gold" onclick="resolveIncomingAttack('${esc(id)}')">${esc(armor?.icon||'🛡️')} ໃຊ້${esc(armor?.name||id)}</button>`}).join('');
- root.innerHTML=`<div class="overlay" data-incoming-attack><div class="panel" style="width:min(560px,100%);text-align:center;max-height:90vh;overflow:auto"><div class="big">⚠️</div><h2>ກຳລັງຈະຖືກໂຈມຕີ!</h2><div class="notice"><div style="font-size:24px">${esc(meta?.icon||'⚔️')} ${esc(meta?.name||prompt.itemId)}</div><p>ທີມ ${esc(String(attacker?.team||'?'))}: ${esc(attacker?.name||'ທີມອື່ນ')} ສົ່ງໄອເທັມນີ້ມາຫາທ່ານ</p><p>ເລືອກເກາະທີ່ຈະໃຊ້ປ້ອງກັນ (ໃຊ້ໄດ້ 1 ອັນ)</p></div><p>ເວລາຕັດສິນໃຈ: <strong data-incoming-countdown>5</strong> ວິນາທີ</p><div class="actions" style="justify-content:center;flex-wrap:wrap">${armorButtons}<button class="danger" onclick="resolveIncomingAttack(null)">⚔️ ບໍ່ໃຊ້ເກາະ</button></div><p class="small muted">ຖ້າໝົດເວລາ ລະບົບຈະບໍ່ໃຊ້ເກາະ</p></div></div>`;
+  const revengeButton=prompt.revengeAvailable?`<button class="gold" onclick="resolveIncomingAttack('revengekill')">⚖️ ໃຊ້ ແກ້ແຄ້ນຢ່າງສາສົມ ຕອບໂຕ້</button>`:'';
+ root.innerHTML=`<div class="overlay" data-incoming-attack><div class="panel" style="width:min(560px,100%);text-align:center;max-height:90vh;overflow:auto"><div class="big">⚠️</div><h2>ກຳລັງຈະຖືກໂຈມຕີ!</h2><div class="notice"><div style="font-size:24px">${esc(meta?.icon||'⚔️')} ${esc(meta?.name||prompt.itemId)}</div><p>ທີມ ${esc(String(attacker?.team||'?'))}: ${esc(attacker?.name||'ທີມອື່ນ')} ສົ່ງໄອເທັມນີ້ມາຫາທ່ານ</p><p>${prompt.revengeAvailable?'ເລືອກໃຊ້ ແກ້ແຄ້ນຢ່າງສາສົມ ເພື່ອສັງຫານທີມຜູ້ສົ່ງກັບຄືນ ຫຼື ບໍ່ໃຊ້':'ເລືອກເກາະທີ່ຈະໃຊ້ປ້ອງກັນ (ໃຊ້ໄດ້ 1 ອັນ)'}</p></div><p>ເວລາຕັດສິນໃຈ: <strong data-incoming-countdown>5</strong> ວິນາທີ</p><div class="actions" style="justify-content:center;flex-wrap:wrap">${armorButtons}${revengeButton}<button class="danger" onclick="resolveIncomingAttack(null)">⚔️ ບໍ່ໃຊ້ / ຍອມຮັບຜົນ</button></div><p class="small muted">ຖ້າໝົດເວລາ ລະບົບຈະບໍ່ໃຊ້ເກາະ</p></div></div>`;
  const tick=()=>{if(incomingPromptKey!==key){clearInterval(incomingPromptTimer);incomingPromptTimer=null;return;}const left=Math.max(0,Math.ceil((Number(prompt.expiresAt)-Date.now())/1000));const el=root.querySelector('[data-incoming-countdown]');if(el)el.textContent=left;if(left<=0){clearInterval(incomingPromptTimer);incomingPromptTimer=null;resolveIncomingAttack(null);}};
  tick();incomingPromptTimer=setInterval(tick,200);
+}
+function scheduleRevengeDeathFinalization(targetId,attackerId,triggeredAt,dueAt){
+ const key=`${targetId}:${attackerId}:${triggeredAt}`;
+ if(revengeDeathTimers[key])return;
+ const when=Number(dueAt)||Date.now();
+ revengeDeathTimers[key]=setTimeout(()=>{
+  const targetEffectsRef=roomRef.child('game/effects/'+targetId);
+  targetEffectsRef.transaction(current=>{
+   if(!current||current.revengeKillPendingDeath!==true||current.revengeKillAttackerDeathConfirmed!==true||Number(current.revengeKillTriggeredAt||0)!==Number(triggeredAt)||current.revengeKillAttacker!==attackerId)return;
+   const fx={...current};
+   const at=Date.now();
+   const sourceName=fx.eliminatedBy?.fromName||`ທີມ ${state?.teams?.[attackerId]?.team||'?'}: ${state?.teams?.[attackerId]?.name||'ບໍ່ຮູ້ຊື່'}`;
+   const meta=ITEMS.find(x=>x.id==='kill');
+   fx.revengeKillPendingDeath=false;
+   fx.notice={id:at,title:'💀 ທ່ານຖືກສັງຫານໂຫດ!',detail:`ຜູ້ສົ່ງ: ${sourceName}`,itemId:'kill',from:attackerId,at,lost:true};
+   fx.eliminated=true;
+   fx.eliminatedBy={itemId:'kill',from:attackerId,fromName:sourceName,itemName:meta?.name||'ສັງຫານໂຫດ',at};
+   return fx;
+  }).then(result=>{
+   if(!result.committed)return;
+   const victim=state?.teams?.[targetId];
+   const meta=ITEMS.find(x=>x.id==='kill');
+   return roomRef.child('teams/'+targetId+'/alive').set(false).then(()=>pushGameNotice({from:attackerId,to:targetId,itemId:'kill',itemName:meta?.name||'ສັງຫານໂຫດ',status:'💀 ຖືກຄັດອອກ',kind:'loss',message:`ທີມ ${victim?.team||'?'}: ${victim?.name||'ທີມເປົ້າໝາຍ'} ຖືກສັງຫານຫຼັງຈາກ ແກ້ແຄ້ນຢ່າງສາສົມ ຕອບໂຕ້ສຳເລັດ 1 ວິນາທີ`}));
+  }).catch(err=>console.error('finalize revenge kill failed',err)).finally(()=>{delete revengeDeathTimers[key];});
+ },Math.max(0,when-Date.now()));
+}
+function scheduleRevengeAttackerDeath(targetId,attackerId,triggeredAt,dueAt){
+ const key=`attacker:${targetId}:${attackerId}:${triggeredAt}`;
+ if(revengeDeathTimers[key])return;
+ revengeDeathTimers[key]=setTimeout(()=>{
+  const targetFxRef=roomRef.child('game/effects/'+targetId);
+  targetFxRef.transaction(current=>{
+   if(!current||current.revengeKillPendingDeath!==true||current.revengeKillAttackerDeathConfirmed===true||Number(current.revengeKillTriggeredAt||0)!==Number(triggeredAt)||current.revengeKillAttacker!==attackerId||Number(current.revengeKillAttackerDeathAt||0)!==Number(dueAt))return;
+   return {...current,revengeKillAttackerDeathProcessing:true};
+  }).then(result=>{
+   if(!result.committed)return;
+   const fx=result.snapshot.val()||{};
+   const target=state?.teams?.[targetId],attacker=state?.teams?.[attackerId];
+   const attackerNotice={id:Date.now(),title:'⚖️ ແກ້ແຄ້ນຢ່າງສາສົມ!',detail:'ຜູ້ສົ່ງ ສັງຫານໂຫດ ຖືກຄັດອອກແລ້ວ',itemId:'revengekill',from:targetId,at:Date.now(),lost:true};
+   const updates={};updates['teams/'+attackerId+'/alive']=false;
+   updates['game/effects/'+attackerId+'/notice']=attackerNotice;
+   updates['game/effects/'+attackerId+'/eliminated']=true;
+   updates['game/effects/'+attackerId+'/eliminatedBy']={itemId:'revengekill',from:targetId,fromName:`ທີມ ${target?.team||'?'}: ${target?.name||'ທີມ B'}`,itemName:'ແກ້ແຄ້ນຢ່າງສາສົມ',at:Date.now()};
+   updates['game/effects/'+targetId+'/revengeKillAttackerDeathConfirmed']=true;
+   updates['game/effects/'+targetId+'/revengeKillDeathAt']=Number(triggeredAt)+2000;
+   updates['game/effects/'+targetId+'/revengeKillAttackerDeathProcessing']=null;
+return roomRef.update(updates).then(()=>pushGameNotice({from:targetId,to:attackerId,itemId:'revengekill',itemName:'ແກ້ແຄ້ນຢ່າງສາສົມ',status:'⚖️ ຜູ້ສົ່ງຖືກຄັດອອກ',kind:'loss',message:`ທີມ ${attacker?.team||'?'}: ${attacker?.name||'ຜູ້ສົ່ງ'} ຖືກ ແກ້ແຄ້ນຢ່າງສາສົມ ຄັດອອກຫຼັງ 1 ວິນາທີ`})).then(()=>scheduleRevengeDeathFinalization(targetId,attackerId,triggeredAt,Number(triggeredAt)+2000));
+  }).catch(err=>console.error('finalize revenge attacker failed',err)).finally(()=>{delete revengeDeathTimers[key];});
+ },Math.max(0,Number(dueAt)-Date.now()));
+}
+function processPendingRevengeDeaths(){
+ const effects=state?.game?.effects||{};
+ Object.entries(effects).forEach(([targetId,fx])=>{
+  if(fx?.revengeKillPendingDeath!==true)return;
+  const attackerId=fx.revengeKillAttacker,triggeredAt=Number(fx.revengeKillTriggeredAt||0);
+  if(!attackerId||!triggeredAt)return;
+  if(fx.revengeKillAttackerDeathConfirmed===true){
+   scheduleRevengeDeathFinalization(targetId,attackerId,triggeredAt,Number(fx.revengeKillDeathAt||triggeredAt+2000));
+  }else if(Number(fx.revengeKillAttackerDeathAt||0)>0){
+   scheduleRevengeAttackerDeath(targetId,attackerId,triggeredAt,Number(fx.revengeKillAttackerDeathAt));
+  }
+ });
 }
 function doAttack(itemId,from,to){
  // ກວດເປົ້າໝາຍຈາກ ID ທີມໂດຍກົງ ແລະຫ້າມສົ່ງຜົນໃສ່ຕົນເອງ
@@ -777,8 +1004,19 @@ function doAttack(itemId,from,to){
  const effectRef=roomRef.child('game/effects/'+to);
  return effectRef.transaction(current=>{
   const fx={...(current||{})};
-  fx.notice={id:now,title:itemId==='kill'?'💀 ທ່ານຖືກສັງຫານໂຫດ!':`⚠️ ທ່ານກຳລັງຖືກໃຊ້ຟັງຊັນ: ${actionName}`,detail:`ຜູ້ສົ່ງ: ${sourceName}`,itemId,from,at:now,lost:itemId==='kill'};
-  if(itemId==='kill'){fx.eliminated=true;fx.eliminatedBy={itemId,from,fromName:sourceName,itemName:actionName,at:now};}
+  // ຖ້າກຳລັງນັບຖອຍຫຼັງຈາກ ແກ້ແຄ້ນຢ່າງສາສົມ ຫ້າມການໂຈມຕີອື່ນມາຂຽນທັບຜົນ.
+  if(fx.revengeKillPendingDeath===true)return;
+  const revengeWillTrigger=itemId==='kill'&&fx.revengeKillArmed===true;
+  fx.notice=revengeWillTrigger
+   ?{id:now,title:'⚖️ ແກ້ແຄ້ນຢ່າງສາສົມ ເຮັດວຽກແລ້ວ!',detail:`${sourceName} ຖືກສັງຫານກ່ອນ — ທ່ານຈະຖືກສັງຫານອີກ 1 ວິນາທີ`,itemId:'revengekill',from,at:now,lost:false,pendingDeath:true}
+   :{id:now,title:itemId==='kill'?'💀 ທ່ານຖືກສັງຫານໂຫດ!':`⚠️ ທ່ານກຳລັງຖືກໃຊ້ຟັງຊັນ: ${actionName}`,detail:`ຜູ້ສົ່ງ: ${sourceName}`,itemId,from,at:now,lost:itemId==='kill'};
+  if(itemId==='kill'){
+   fx.eliminated=true;fx.eliminatedBy={itemId,from,fromName:sourceName,itemName:actionName,at:now};
+   if(fx.revengeKillArmed===true){
+    fx.revengeKillArmed=false;fx.revengeKillTriggeredAt=now;fx.revengeKillAttacker=from;
+    fx.revengeKillPendingDeath=true;fx.revengeKillDeathAt=now+1000;
+   }
+  }
   if(itemId==='poison')fx.poison=true;
   if(['virus','sandstorm','meteor','flip','blink'].includes(itemId)||/^meme\d*$/.test(itemId)){
    const visualQueue=Array.isArray(fx.visualQueue)?fx.visualQueue.slice():[];
@@ -794,9 +1032,29 @@ function doAttack(itemId,from,to){
   return fx;
  }).then(result=>{
   if(!result.committed)return false;
+  const committedFx=result.snapshot.val()||{};
+  const revengeTriggered=itemId==='kill'&&Number(committedFx.revengeKillTriggeredAt||0)===now&&committedFx.revengeKillAttacker===from;
+  let revengeDeathDueAt=0;
+  if(revengeTriggered){
+   revengeDeathDueAt=Date.now()+1000;
+   const counterNotice={id:now,title:'💀 ຖືກສັງຫານກັບຄືນ!',detail:`ທີມທີ່ທ່ານສົ່ງ ສັງຫານໂຫດ ໄດ້ໃຊ້ ແກ້ແຄ້ນຢ່າງສາສົມ ຕອບໂຕ້`,itemId:'revengekill',from:to,at:now,lost:true};
+   // ໃຫ້ อย่างสาสม ຕອບໂຕ້ກ່ອນ: A ຈະຕາຍໃນ 1 ວິນາທີ, ແລ້ວ B ຈະຕາຍອີກ 1 ວິນາທີຕໍ່ມາ.
+   // ບໍ່ຂ້າ B ໃນ update ນີ້ ແລະບໍ່ຂ້າ A ກ່ອນເວລາ ເພື່ອໃຫ້ລຳດັບເອັບເຟັກຊັດເຈນ.
+   delete directUpdates['teams/'+to+'/alive'];
+   directUpdates['game/effects/'+to+'/revengeKillAttackerDeathAt']=now+1000;
+   directUpdates['game/effects/'+to+'/revengeKillDeathAt']=now+2000;
+   directUpdates['game/effects/'+from+'/notice']={...counterNotice,detail:'ແກ້ແຄ້ນຢ່າງສາສົມ ຕອບໂຕ້ແລ້ວ — ທ່ານຈະຖືກຄັດອອກໃນ 1 ວິນາທີ',lost:false,pendingDeath:true};
+   directUpdates['game/effects/'+from+'/revengeKillPendingDeath']=true;
+   directUpdates['game/effects/'+from+'/revengeKillDeathAt']=now+1000;
+   directUpdates['game/effects/'+from+'/eliminatedBy']={itemId:'revengekill',from:to,fromName:`ທີມ ${victim.team}: ${victim.name}`,itemName:'ແກ້ແຄ້ນຢ່າງສາສົມ',at:now};
+  }
   const finish=Object.keys(directUpdates).length?roomRef.update(directUpdates):Promise.resolve();
-  const noticeMessage=itemId==='kill'?`${sourceName} ໃຊ້ ${actionName} ແລະຄັດອອກ ທີມ ${victim.team}: ${victim.name}`:`${sourceName} ໃຊ້ ${actionName} ກັບ ທີມ ${victim.team}: ${victim.name}`;
-  return finish.then(()=>pushGameNotice({from,to,itemId,itemName:actionName,status:itemId==='kill'?'💀 ຖືກຄັດອອກ':'⚠️ ມີຜົນກະທົບ',kind:itemId==='kill'?'loss':'impact',message:noticeMessage})).then(()=>true);
+  const noticeMessage=itemId==='kill'?(revengeTriggered?`${sourceName} ໃຊ້ ${actionName} ໃສ່ ທີມ ${victim.team}: ${victim.name}; ແກ້ແຄ້ນຢ່າງສາສົມ ເຮັດວຽກກ່ອນ — A ຈະຕາຍໃນ 1 ວິນາທີ ແລະ B ຈະຕາຍອີກ 1 ວິນາທີຕໍ່ມາ`:`${sourceName} ໃຊ້ ${actionName} ແລະຄັດອອກ ທີມ ${victim.team}: ${victim.name}`):`${sourceName} ໃຊ້ ${actionName} ກັບ ທີມ ${victim.team}: ${victim.name}`;
+  return finish.then(()=>{
+   // ເຄື່ອງຜູ້ສົ່ງແລະທຸກໆຈໍທີ່ເຊື່ອມຕໍ່ຈະຈັດຕາຕະລາງການຕາຍຂອງ B ອີກ 1 ວິນາທີຕໍ່ມາ.
+   if(revengeTriggered)scheduleRevengeAttackerDeath(to,from,now,now+1000);
+   return pushGameNotice({from,to,itemId,itemName:actionName,status:itemId==='kill'?'💀 ກຳລັງຄັດອອກ':'⚠️ ມີຜົນກະທົບ',kind:itemId==='kill'?'loss':'impact',message:noticeMessage}).then(()=>revengeTriggered?pushGameNotice({from:to,to:from,itemId:'revengekill',itemName:'ແກ້ແຄ້ນຢ່າງສາສົມ',status:'⚖️ ສັງຫານກັບຄືນ',kind:'loss',message:`ທີມ ${victim.team}: ${victim.name} ໃຊ້ ແກ້ແຄ້ນຢ່າງສາສົມ ຕອບໂຕ້ — ທີມທີ່ສົ່ງ ສັງຫານໂຫດ ຈະຖືກຄັດອອກໃນ 1 ວິນາທີ; ເປົ້າໝາຍຈະຕາຍອີກ 1 ວິນາທີຕໍ່ມາ`}):true);
+  }).then(()=>true);
  }).catch(err=>{console.error('doAttack failed',err);throw err;});
 }
 function showEffect(id,effect){
@@ -829,7 +1087,7 @@ function toggleHostScores(){
  hostScoresVisible=!hostScoresVisible;
  const board=$('hostScoreBoard'),btn=$('toggleHostScoresBtn');
  if(board)board.classList.toggle('hidden',!hostScoresVisible);
- if(btn)btn.textContent=hostScoresVisible?'🙈 ເຊື່ອງຄະແນນທຸກທີມ':'👁️ ແສດງຄະແນນທຸກທີມ';
+ if(btn)btn.textContent=hostScoresVisible?'🙈 ເຊື່ອງຄະແນນທຸກທີມ':'👁️ ສະແດງຄະແນນທຸກທີມ';
  renderHostGame();
 }
 function renderHostScoreBoard(){
@@ -849,7 +1107,25 @@ function renderLiveFeeds(){
  const host=$('hostLiveFeed');if(host)host.innerHTML=all.map(n=>`<div class="live-event ${n.kind==='loss'?'loss':n.to?'impact':''}"><b>${esc(n.status||'🔔 ແຈ້ງເຕືອນ')}: ${esc(n.itemName||'ຟັງຊັນ')}</b><div>${esc(n.message||'')}</div><div class="small muted">${new Date(Number(n.at||Date.now())).toLocaleTimeString()}</div></div>`).join('')||'<div class="muted small">ຍັງບໍ່ມີການໃຊ້ຟັງຊັນ</div>';
  const player=$('playerLiveFeed');if(player){const mine=all.filter(n=>n.from===playerId||n.to===playerId);player.innerHTML=mine.map(n=>`<div class="live-event ${n.kind==='loss'?'loss':n.to?'impact':''}"><b>${esc(n.status||'🔔 ແຈ້ງເຕືອນ')}: ${esc(n.itemName||'ຟັງຊັນ')}</b><div>${esc(n.message||'')}</div><div class="small muted">${new Date(Number(n.at||Date.now())).toLocaleTimeString()}</div></div>`).join('')||'<div class="muted small">ການແຈ້ງເຕືອນທີ່ກ່ຽວກັບທີມທ່ານຈະສະແດງຢູ່ນີ້</div>';}
 }
-function renderHostGame(){const teams=Object.entries(state.teams||{}).sort((a,b)=>a[1].team-b[1].team);$('hostRound').textContent=`ຮອບ ${state.game?.round||0}/15`;const left=Math.max(0,Math.ceil(((state.game?.endsAt||Date.now())-Date.now())/1000));$('hostGameTimer').textContent=String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0');$('hostTeams').innerHTML=teams.map(([id,t])=>{const q=state.game?.questionByTeam?.[id],ans=state.game?.answered?.[id];return `<div class="teamview"><div class="between"><h3>ທີມ ${t.team}: ${esc(t.name)}</h3><span class="pill">${hostScoresVisible?`${Number(t.score||0)} ຄະແນນ`:`ຄະແນນ •••`}</span></div><div class="wallet-line"><b>💰 ເງິນຄົງເຫຼືອ</b><strong>${Math.max(0,Number(t.money??100))} 🪙</strong></div><div class="money-track"><div class="money-fill ${Number(t.money??100)<=20?'low':''}" style="width:${Math.max(0,Math.min(100,Number(t.money??100)))}%"></div></div><div class="small muted" style="margin-top:8px">ໄອເທັມ ${(t.inventory||[]).length} • ຕອບແລ້ວ ${t.answered||0}/15</div>${!t.alive?'<b class="dangertext">ແພ້ / ຖືກຄັດອອກ</b>':''}${q?`<div class="qtext">${q.question}</div><div class="choices">${(q.choices||[]).map(c=>`<div class="choice">${c}</div>`).join('')}</div>`:'<p class="muted">ລໍຖ້າຄຳຖາມ</p>'}<div class="notice">${ans?`${ans.correct?'✅ ຕອບຖືກ':'❌ ຕອບຜິດ'} • ຄຳຕອບ: ${esc(ans.choice)}`:'⏳ ກຳລັງຕອບ…'}</div><div class="small">🎒 ${(t.inventory||[]).map(i=>(ITEMS.find(x=>x.id===i.id)||{}).name||i.id).join('、')||'ບໍ່ມີໄອເທັມ'}</div></div>`}).join('');renderHostScoreBoard();renderLiveFeeds();const allDone=teams.length===4&&teams.every(([id,t])=>!t.alive||Number(t.answered||0)>=15);$('hostActions').innerHTML=teams.map(([id,t])=>`<button class="secondary" onclick="hostEliminate('${id}')">ຄັດອອກ: ${esc(t.name)}</button>`).join('')+(allDone?`<button class="gold" onclick="openWinnerPage()">🏆 ສະແດງຜູ້ຊະນະ</button>`:'<span class="muted small">🏆 ປຸ່ມສະແດງຜູ້ຊະນະຈະປາກົດເມື່ອທຸກທີມຕອບຄົບ 15 ຂໍ້ ຫຼື ຖືກຄັດອອກ</span>');if(window.MathJax&&typeof MathJax.typesetPromise==='function')MathJax.typesetPromise([$ ('hostTeams')]).catch(()=>{})}
+function renderHostEffectPreview(id,team){
+ const fx=state?.game?.effects?.[id]||{};
+ const now=Date.now(),until=Number(fx.visualUntil||0),active=!!fx.visual&&until>now;
+ const effect=active?String(fx.visual):'';
+ const meta=ITEMS.find(x=>x.id===effect);
+ let visual='';
+ if(active){
+  if(effect.startsWith('meme')){const n=Number(effect.slice(4))||1;const meme=MEMES[n-1]||MEMES[0];visual=`<div class="host-mini-visual meme-mini"><span>${meme[0]}</span><b>${esc(meme[1])}</b></div>`;}
+  else {const visuals={virus:['🦠','ໄວຣັສກຳລັງລົງ'],sandstorm:['🌪️','ພາຍຸທະເລຊາຍ'],meteor:['☄️','ອຸກາບາດຖະຫຼົ່ມ'],flip:['🙃','ຈໍກັບຫົວ'],blink:['💡','ຈໍກະພິບ']};const v=visuals[effect]||[meta?.icon||'⚡',meta?.name||effect];visual=`<div class="host-mini-visual ${effect==='blink'?'mini-blink':''} ${effect==='flip'?'mini-flip':''} ${effect==='sandstorm'?'mini-storm':''}"><span>${v[0]}</span><b>${esc(v[1])}</b><small>ເຫຼືອ ${Math.max(0,Math.ceil((until-now)/1000))} ວິ</small></div>`;}
+ }
+ const notice=fx.notice;
+ const noticeHtml=notice?`<div class="host-mini-notice ${notice.lost?'is-loss':''}"><b>${esc(notice.title||'🔔 ແຈ້ງເຕືອນ')}</b><div>${esc(notice.detail||'')}</div></div>`:'';
+ const pending=fx.incomingPrompt?.status==='pending'?'<div class="host-mini-pending">⚠️ ກຳລັງເລືອກເກາະປ້ອງກັນ</div>':'';
+ const armed=fx.revengeKillArmed?'<span class="host-mini-tag">⚖️ ແກ້ແຄ້ນຢ່າງສາສົມ ພ້ອມຕອບໂຕ້</span>':'';
+ const queued=Array.isArray(fx.visualQueue)&&fx.visualQueue.length?`<span class="host-mini-tag">⏳ ຄິວເອັບເຟັກ ${fx.visualQueue.length}</span>`:'';
+ const flags=[team.timePenalty?.remaining>0?`⏱️ ຖືກຕັດເວລາ ${Number(team.timePenalty.seconds)||0} ວິ`:'',fx.poison?'☠️ ຄຳຖາມພິດ':'' ].filter(Boolean).map(x=>`<span class="host-mini-tag">${x}</span>`).join('');
+ return `<div class="host-effect-preview ${active?'has-active-effect':''} ${!team.alive?'team-mini-dead':''}"><div class="host-mini-heading"><span>📺 ຈໍຍ່ອຍທີມ ${esc(String(team.team))}</span>${active?'<span class="host-mini-live">LIVE</span>':''}</div>${visual}${pending}${noticeHtml}${armed}${queued}${flags}${!active&&!notice&&!pending&&!armed&&!queued&&!flags?'<div class="host-mini-empty">ບໍ່ມີເອັບເຟັກກຳລັງເຮັດວຽກ</div>':''}</div>`;
+}
+function renderHostGame(){const teams=Object.entries(state.teams||{}).sort((a,b)=>a[1].team-b[1].team);$('hostRound').textContent=`ຮອບ ${state.game?.round||0}/15`;const left=Math.max(0,Math.ceil(((state.game?.endsAt||Date.now())-Date.now())/1000));$('hostGameTimer').textContent=String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0');$('hostTeams').innerHTML=teams.map(([id,t])=>{const q=state.game?.questionByTeam?.[id],ans=state.game?.answered?.[id],effectPreview=renderHostEffectPreview(id,t);if(state.phase==='finished')return `<div class="teamview"><h3>ທີມ ${t.team}: ${esc(t.name)}</h3><div class="panel" style="text-align:center;margin-top:16px;padding:35px 8px"><div style="font-size:44px">🏁</div><h2>ເກມຈົບແລ້ວ</h2></div></div>`;return `<div class="teamview"><div class="between"><h3>ທີມ ${t.team}: ${esc(t.name)}</h3><span class="pill">${hostScoresVisible?`${Number(t.score||0)} ຄະແນນ`:`ຄະແນນ •••`}</span></div>${effectPreview}<div class="wallet-line"><b>💰 ເງິນຄົງເຫຼືອ</b><strong>${Math.max(0,Number(t.money??100))} 🪙</strong></div><div class="money-track"><div class="money-fill ${Number(t.money??100)<=20?'low':''}" style="width:${Math.max(0,Math.min(100,Number(t.money??100)))}%"></div></div><div class="small muted" style="margin-top:8px">ໄອເທັມ ${(t.inventory||[]).length} • ຕອບແລ້ວ ${t.answered||0}/15</div>${!t.alive?'<b class="dangertext">ແພ້ / ຖືກຄັດອອກ</b>':''}${q?`<div class="qtext">${q.question}</div><div class="choices">${(q.choices||[]).map(c=>`<div class="choice">${c}</div>`).join('')}</div>`:'<p class="muted">ລໍຖ້າຄຳຖາມ</p>'}<div class="notice">${ans?`${ans.correct?'✅ ຕອບຖືກ':'❌ ຕອບຜິດ'} • ຄຳຕອບ: ${esc(ans.choice)}`:'⏳ ກຳລັງຕອບ…'}</div><div class="small">🎒 ${(t.inventory||[]).map(i=>(ITEMS.find(x=>x.id===i.id)||{}).name||i.id).join('、')||'ບໍ່ມີໄອເທັມ'}</div></div>`}).join('');renderHostScoreBoard();renderLiveFeeds();const allDone=state.phase==='finished'||teams.length===4&&teams.every(([id,t])=>!t.alive||Number(t.answered||0)>=15);$('hostActions').innerHTML=teams.map(([id,t])=>`<button class="secondary" onclick="hostEliminate('${id}')">ຄັດອອກ: ${esc(t.name)}</button>`).join('')+(state.phase==='finished'?`<button class="gold" onclick="showFinalRanking()">🏆 ສະແດງຜູ້ຊະນະ</button>`:'<span class="muted small">🏆 ປຸ່ມສະແດງຜູ້ຊະນະຈະປາກົດເມື່ອທຸກທີມຕອບຄົບ 15 ຂໍ້ ຫຼື ຖືກຄັດອອກ</span>');if(window.MathJax&&typeof MathJax.typesetPromise==='function')MathJax.typesetPromise([$ ('hostTeams')]).catch(()=>{})}
 let winnerRevealTimers=[];
 function closeWinnerScreen(){
  winnerRevealTimers.forEach(clearTimeout);winnerRevealTimers=[];
@@ -875,12 +1151,27 @@ function openWinnerPage(){
  roomRef?.child('game/winnerRevealAt').set(Date.now()).catch(()=>{});
 }
 function hostEliminate(id){if(confirm('ຄັດອອກທີມນີ້?'))roomRef.child('teams/'+id+'/alive').set(false)}
-function renderAll(){if(!state)return;renderLiveFeeds();
- if(role==='player')renderIncomingAttackPrompt();
- if(state.phase==='countdown'){const root=$('overlayRoot');if(!root.dataset.countdown){root.dataset.countdown='1';let n=3;root.innerHTML='<div class="overlay"><div><div class="big">ເຕັມພ້ອມ!</div><div class="big" id="countNum">3</div><p>ກຽມຕົວຕອບຄຳຖາມ</p></div></div>';const tick=setInterval(()=>{n--;$('countNum')&&($('countNum').textContent=Math.max(0,n));if(n<=0){clearInterval(tick);root.innerHTML='';delete root.dataset.countdown}},1000)}}else{const activeVisual=role==='player'&&state?.game?.effects?.[playerId]?.visual&&Number(state.game.effects[playerId].visualUntil||0)>Date.now();if(!activeVisual){$('overlayRoot').innerHTML='';delete $('overlayRoot').dataset.countdown}}
+function renderAll(){if(!state)return;processPendingRevengeDeaths();renderLiveFeeds();
+ if(role==='player'&&state.phase!=='finished')renderIncomingAttackPrompt();
+ if(state.phase==='countdown'){const root=$('overlayRoot');if(!root.dataset.countdown){root.dataset.countdown='1';let n=3;root.innerHTML='<div class="overlay"><div><div class="big">ກຽມພ້ອມ!</div><div class="big" id="countNum">3</div><p>ກຽມຕົວຕອບຄຳຖາມ</p></div></div>';const tick=setInterval(()=>{n--;$('countNum')&&($('countNum').textContent=Math.max(0,n));if(n<=0){clearInterval(tick);root.innerHTML='';delete root.dataset.countdown}},1000)}}else{const activeVisual=role==='player'&&state?.game?.effects?.[playerId]?.visual&&Number(state.game.effects[playerId].visualUntil||0)>Date.now();if(!activeVisual||state.phase==='finished'){$('overlayRoot').innerHTML='';delete $('overlayRoot').dataset.countdown}}
  if(role==='host'){if(state.phase==='lobby'){showOnly('hostLobby');renderLobby()}else if(state.phase==='auction'){showOnly('hostAuction');renderAuctionItems('hostAuctionItems');renderAuctionDashboard('host');$('auctionTeamCount').textContent=`ຄົບ ${playersList().length}/4 ທີມ`}else{showOnly('hostGame');renderHostGame()}}else if(role==='player'){if(state.phase==='lobby'&&!state.players?.[playerId]){showOnly('playerJoin')}else if(state.phase==='auction'){showOnly('playerAuction');renderAuctionItems('playerAuctionItems');renderAuctionDashboard('player')}else{showOnly('playerGame');renderPlayerQuestion();renderInventory();const left=Math.max(0,Math.ceil(((state.game?.deadlines?.[playerId]||Date.now())-Date.now())/1000));$('playerGameTimer').textContent=left+'s';const fx=state.game?.effects?.[playerId];if(fx?.visual&&fx.visualUntil>Date.now()&&window.lastVisualKey!==fx.visual+':'+fx.visualUntil){window.lastVisualKey=fx.visual+':'+fx.visualUntil;showEffect(playerId,fx.visual)}}}}
 function resetRoom(){if(confirm('ລຶບຂໍ້ມູນຫ້ອງ ແລະເລີ່ມໃໝ່?'))roomRef.remove().then(()=>backHome())}
-function finishGame(){if(role!=='host')return;const teams=Object.values(state.teams||{}).sort((a,b)=>b.score-a.score);roomRef.update({phase:'finished'});$('modalRoot').innerHTML=`<div class="overlay"><div class="panel"><div class="big">🏆</div><h2>ສະຫຼຸບຜົນເກມ</h2>${teams.map((t,i)=>`<p>${i+1}. ${esc(t.name)} — <b>${t.score}</b> ຄະແນນ</p>`).join('')}<button onclick="closeModal()">ປິດ</button></div></div>`}
+function finishGame(){
+ if(role!=='host'||!state||!roomRef)return;
+ closeModal();
+ closeWinnerScreen();
+ roomRef.update({phase:'finished'}).catch(err=>alert('ບໍ່ສາມາດຈົບເກມ: '+err.message));
+}
+
+function showFinalRanking() {
+ if(role!=='host'||!state||state.phase!=='finished')return;
+ openWinnerPage();
+}
+
+function closeFinalRanking() {
+  const overlay = $('winnerScreenOverlay');
+  if (overlay) overlay.classList.add('hidden');
+}
 function showQuestionBank(){const json=JSON.stringify(state.questions||SAMPLE_QUESTIONS,null,2);$('modalRoot').innerHTML=`<div class="overlay"><div class="panel" style="width:min(850px,100%);max-height:90vh;overflow:auto" onclick="event.stopPropagation()"><h2>📚 ຄຳຖາມ JSON</h2><p class="muted">ໃສ່ JSON array ທີ່ມີ question, choices, answer. ສູດ MathJax ໃຊ້ \\\\( ... \\\\).</p><textarea id="questionJson">${esc(json)}</textarea><div class="actions"><button onclick="saveQuestionBank()">ບັນທຶກ</button><button class="secondary" onclick="closeModal()">ປິດ</button></div><p id="jsonError" class="dangertext"></p></div></div>`}
 function saveQuestionBank(){try{const q=JSON.parse($('questionJson').value);if(!Array.isArray(q)||!q.length||!q.every(x=>x.question&&Array.isArray(x.choices)&&x.answer))throw Error('ຮູບແບບ JSON ບໍ່ຖືກຕ້ອງ');roomRef.child('questions').set(q).then(()=>{closeModal();alert('ບັນທຶກຄຳຖາມແລ້ວ')})}catch(e){$('jsonError').textContent=e.message}}
 function showSetup(){$('modalRoot').innerHTML=`<div class="overlay"><div class="panel" style="max-width:720px;text-align:left;max-height:90vh;overflow:auto"><h2>⚙️ ຕັ້ງຄ່າ Firebase</h2><p>1. ເປີດ Firebase Console → Realtime Database ແລະສ້າງ database.</p><p>2. ຄັດລອກ Database URL ທີ່ Firebase ສະແດງ ໄປໃສ່ <code>databaseURL</code> ໃນ code (URL ອາດເປັນ <code>...firebasedatabase.app</code> ຫຼື <code>...firebaseio.com</code>).</p><p>3. ຕັ້ງ Rules ສຳລັບທົດລອງໃຫ້ອະນຸຍາດ read/write. ຢ່າໃຊ້ public rules ກັບເກມທີ່ໃຊ້ຈິງ.</p><p>4. ໂຮສໄຟລ໌ຜ່ານ HTTPS ເຊັ່ນ Firebase Hosting.</p><p class="dangertext">ໝາຍເຫດ: ນີ້ແມ່ນໂຄງສ້າງເກມສະບັບຕົ້ນແບບ. ຄວນເພີ່ມ Firebase Authentication ແລະ Security Rules ກ່ອນໃຊ້ງານສາທາລະນະ.</p><button onclick="closeModal()">ເຂົ້າໃຈແລ້ວ</button></div></div>`}
