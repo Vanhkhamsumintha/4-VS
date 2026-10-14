@@ -483,24 +483,40 @@ function renderIncomingAttackPrompt(){
  tick();incomingPromptTimer=setInterval(tick,200);
 }
 function doAttack(itemId,from,to){
- const victim=state.teams[to];if(!victim)return Promise.resolve();
- const fx={...(state.game.effects?.[to]||{})},updates={};
- const meta=ITEMS.find(x=>x.id===itemId),attacker=state.teams[from];
- const actionName=meta?.name||itemId;
+ // ກວດເປົ້າໝາຍຈາກ ID ທີມໂດຍກົງ ແລະຫ້າມສົ່ງຜົນໃສ່ຕົນເອງ
+ if(!from||!to||from===to||!ITEMS.some(x=>x.id===itemId))return Promise.resolve();
+ const victim=state.teams?.[to],attacker=state.teams?.[from];
+ if(!victim||!attacker||!victim.alive)return Promise.resolve();
+ const meta=ITEMS.find(x=>x.id===itemId),actionName=meta?.name||itemId;
  const sourceName=`ທີມ ${attacker?.team||'?'}: ${attacker?.name||'ບໍ່ຮູ້ຊື່'}`;
- fx.notice={id:Date.now(),title:itemId==='kill'?'💀 ທ່ານຖືກສັງຫານໂຫດ!':`⚠️ ທ່ານກຳລັງຖືກໃຊ້ຟັງຊັນ: ${actionName}`,detail:`ຜູ້ສົ່ງ: ${sourceName}`,itemId,from,at:Date.now(),lost:itemId==='kill'};
- if(itemId==='kill'){updates['teams/'+to+'/alive']=false;fx.eliminated=true;fx.eliminatedBy={itemId,from,fromName:sourceName,itemName:actionName,at:Date.now()};}
- else if(itemId==='poison')fx.poison=true;
- else if(itemId==='hellheart')updates['teams/'+to+'/hellheart']=(victim.hellheart||0)+1;
- else if(itemId.startsWith('timeminus')){const sec=Number(itemId.replace('timeminus',''))||3;updates['teams/'+to+'/timePenalty']={seconds:sec,remaining:3};if(state.phase==='game'&&state.game?.deadlines?.[to])updates['game/deadlines/'+to]=Math.max(Date.now()+1000,state.game.deadlines[to]-sec*1000);}
- else if(['virus','sandstorm','meteor','flip','blink','meme'].includes(itemId)||itemId.startsWith('meme')){
-   // ສົ່ງຜົນກະທົບໄປຫາທີມເປົ້າໝາຍໂດຍກົງ; ບໍ່ໄດ້ເພີ່ມໄອເທັມເຂົ້າກະເປົ໋າຂອງທີມນັ້ນ.
-   fx.visual=itemId;fx.visualUntil=Date.now()+7000
+ const now=Date.now();
+ const directUpdates={};
+ if(itemId==='kill')directUpdates['teams/'+to+'/alive']=false;
+ else if(itemId==='hellheart')directUpdates['teams/'+to+'/hellheart']=(Number(victim.hellheart)||0)+1;
+ else if(itemId.startsWith('timeminus')){
+  const sec=Number(itemId.replace('timeminus',''))||3;
+  directUpdates['teams/'+to+'/timePenalty']={seconds:sec,remaining:3};
+  if(state.phase==='game'&&state.game?.deadlines?.[to])directUpdates['game/deadlines/'+to]=Math.max(now+1000,state.game.deadlines[to]-sec*1000);
+ }else if(itemId==='penalty')directUpdates['game/penaltyMode']=true;
+
+ // ອັບເດດ effect ຂອງທີມເປົ້າໝາຍດ້ວຍ transaction ເພື່ອບໍ່ໃຫ້ການໂຈມຕີທີ່ເຂົ້າພ້ອມກັນຂຽນທັບກັນ.
+ const effectRef=roomRef.child('game/effects/'+to);
+ return effectRef.transaction(current=>{
+  const fx={...(current||{})};
+  fx.notice={id:now,title:itemId==='kill'?'💀 ທ່ານຖືກສັງຫານໂຫດ!':`⚠️ ທ່ານກຳລັງຖືກໃຊ້ຟັງຊັນ: ${actionName}`,detail:`ຜູ້ສົ່ງ: ${sourceName}`,itemId,from,at:now,lost:itemId==='kill'};
+  if(itemId==='kill'){fx.eliminated=true;fx.eliminatedBy={itemId,from,fromName:sourceName,itemName:actionName,at:now};}
+  if(itemId==='poison')fx.poison=true;
+  if(['virus','sandstorm','meteor','flip','blink'].includes(itemId)||/^meme\d*$/.test(itemId)){
+   fx.visual=itemId;
+   fx.visualUntil=now+7000;
   }
- else if(itemId==='penalty')updates['game/penaltyMode']=true;
- updates['game/effects/'+to]=fx;
- const noticeMessage=itemId==='kill'?`${sourceName} ໃຊ້ ${actionName} ແລະຄັດອອກ ທີມ ${victim.team}: ${victim.name}`:`${sourceName} ໃຊ້ ${actionName} ກັບ ທີມ ${victim.team}: ${victim.name}`;
- return roomRef.update(updates).then(()=>pushGameNotice({from,to,itemId,itemName:actionName,status:itemId==='kill'?'💀 ຖືກຄັດອອກ':'⚠️ ມີຜົນກະທົບ',kind:itemId==='kill'?'loss':'impact',message:noticeMessage}));
+  return fx;
+ }).then(result=>{
+  if(!result.committed)return;
+  const finish=Object.keys(directUpdates).length?roomRef.update(directUpdates):Promise.resolve();
+  const noticeMessage=itemId==='kill'?`${sourceName} ໃຊ້ ${actionName} ແລະຄັດອອກ ທີມ ${victim.team}: ${victim.name}`:`${sourceName} ໃຊ້ ${actionName} ກັບ ທີມ ${victim.team}: ${victim.name}`;
+  return finish.then(()=>pushGameNotice({from,to,itemId,itemName:actionName,status:itemId==='kill'?'💀 ຖືກຄັດອອກ':'⚠️ ມີຜົນກະທົບ',kind:itemId==='kill'?'loss':'impact',message:noticeMessage}));
+ }).catch(err=>{console.error('doAttack failed',err);throw err;});
 }
 function showEffect(id,effect){if(playerId!==id)return;const root=$('overlayRoot');const fx=state?.game?.effects?.[id]||{};const until=Number(fx.visualUntil||0);if(until<=Date.now())return;root.innerHTML='';if(localOverlayTimer){clearTimeout(localOverlayTimer);localOverlayTimer=null}if(effect.startsWith('meme')){const memeNo=Number(effect.slice(4))||1;const meme=MEMES[memeNo-1]||MEMES[0];root.innerHTML=`<div class="overlay"><div><div class="meme">${meme[0]}</div><div class="big">${meme[0]} ${esc(meme[1])}</div></div></div>`}else if(effect==='meteor'){root.innerHTML='<div class="overlay"><div class="big">☄️</div></div>'}else if(effect==='virus'){document.body.classList.add('fall')}else if(effect==='sandstorm'){document.body.classList.add('storm','sand')}else if(effect==='flip'){const stage=document.querySelector('.wrap');if(stage){stage.classList.add('flip');let flips=0;const flipTimer=setInterval(()=>{stage.classList.toggle('flip');if(++flips>=3)clearInterval(flipTimer)},1750);setTimeout(()=>{clearInterval(flipTimer);stage.classList.remove('flip')},7000)}}else if(effect==='blink'){document.body.classList.add('blink')}localOverlayTimer=setTimeout(()=>{root.innerHTML='';document.body.classList.remove('fall','storm','sand','flip','blink');document.querySelector('.wrap')?.classList.remove('flip');localOverlayTimer=null;const latest=state?.game?.effects?.[id]||{};if(latest.visual===effect&&Number(latest.visualUntil||0)<=Date.now())roomRef.child('game/effects/'+id+'/visual').remove()},Math.max(0,until-Date.now()))}
 function toggleHostScores(){
