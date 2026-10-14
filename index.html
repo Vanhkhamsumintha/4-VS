@@ -164,17 +164,14 @@ const ITEMS=[
 {id:'cut',name:'ຕັດຊອຍ',icon:'🔪',desc:'ຕັດຄຳຕອບຜິດ 2 ຕົວເລືອກ 1 ຂໍ້',kind:'weapon',value:'cut'},
 {id:'aura',name:'ເພີ່ມບາລະມີ',icon:'✨',desc:'ເພີ່ມຄະແນນຕົນເອງ 1',kind:'weapon',value:'aura'},
 {id:'steal',name:'ລັກສະເບຽງ',icon:'🤑',desc:'ຂະໂມຍ 1 ຄະແນນຈາກແຕ່ລະທີມ',kind:'weapon',value:'steal'},
-{id:'penalty',name:'ຈຸດໂທດ',icon:'⚖️',desc:'ເລີ່ມຮອບຈຸດໂທດ',kind:'weapon',value:'penalty'},
 {id:'heartbox',name:'ບີບກ່ອງດວງໃຈ',icon:'🎁',desc:'ເບິ່ງໄອເທັມສັດຕູ ແລະຂະໂມຍ 1 ອັນ',kind:'attack',value:'heartbox'},
-{id:'poison',name:'ຄຳຖາມພິດ',icon:'☠️',desc:'ສັດຕູຕອບຖືກ −1 ຄະແນນ, ຜິດ −2',kind:'attack',value:'poison'},
 {id:'double',name:'ດັບເບິນດຣາເມດ',icon:'🔋',desc:'ເພີ່ມການໃຊ້ໄອເທັມ 1 ອັນອີກ 1 ຄັ້ງ',kind:'weapon',value:'double'},
 {id:'parallel',name:'ໂລກຄູ່ຂະໜານ',icon:'🪐',desc:'ສະຫຼັບຄະແນນກັບທີມເປົ້າໝາຍ',kind:'attack',value:'parallel'},
-{id:'pick',name:'ຄຳຖາມພິຄາດ',icon:'🎯',desc:'ຕອບຖືກຊະນະ, ຕອບຜິດແພ້',kind:'weapon',value:'pick'},
+{id:'poison',name:'ຄຳຖາມພິດ',icon:'☠️',desc:'ສັດຕູຕອບຖືກ −1 ຄະແນນ, ຜິດ −2',kind:'attack',value:'poison'},
 {id:'god',name:'ໂກງພະເຈົ້າ',icon:'👑',desc:'ຄະແນນເທົ່າກັບທີມຄະແນນສູງສຸດ',kind:'weapon',value:'god'},
 {id:'zombie',name:'ຊອມບີ້',icon:'🧟',desc:'ເອົາໄອເທັມທີ່ເຄີຍໃຊ້ຄືນ 1 ອັນ',kind:'weapon',value:'zombie'},
-{id:'heaven',name:'ນ້ຳຕາສະຫວັນ',icon:'🌈',desc:'ຕອບຖືກ +2, ຕອບຜິດ +1',kind:'weapon',value:'heaven'},
-{id:'hellheart',name:'ຫົວໃຈນະລົກ',icon:'❤️‍🔥',desc:'ສັດຕູຕອບຖືກ −1, ຜິດ −2',kind:'attack',value:'hellheart'}
 ];
+const REMOVED_ITEM_IDS=['penalty','pick','heaven','hellheart'];
 const SAMPLE_QUESTIONS=[
 { question:"ຄວາມໝາຍຂອງການອະພິປາຍແມ່ນຂໍ້ໃດ?", choices: ["ການຄັດຄ້ານຕໍ່ສິ່ງທີ່ບໍ່ດີ","ການສະແດງບົດບາດສົມມຸດ","ການເວົ້າກ່ຽວກັບສິ່ງທີ່ດີຂອງສິ່ງໃດໜຶ່ງ","ການສະແດງຄວາມຄິດເຫັນ 2 ດ້ານ, ເຫດ ແລະ ຜົນ"], answer:"ການສະແດງຄວາມຄິດເຫັນ 2 ດ້ານ, ເຫດ ແລະ ຜົນ"},
 { question:"ຂໍ້ໃດບົ່ງບອກເຖິງການຂຽນຈົດໝາຍ?", choices: ["ຂຽນຫາຄົນທີ່ບໍ່ຮູ້ຈັກ","ຂຽນສິ່ງທີ່ເຮົາເວົ້າໃຫ້ຄົນຮູ້","ຂຽນບອກສິ່ງໃດສິ່ງໜຶ່ງໃຫ້ອ່ານ","ຂຽນເພື່ອສົ່ງຂ່າວຜູ້ລຶ້ງເຄີຍ ແລະ ຮັກແພງ"], answer:"ຂຽນເພື່ອສົ່ງຂ່າວຜູ້ລຶ້ງເຄີຍ ແລະ ຮັກແພງ"},
@@ -223,7 +220,7 @@ function showOnly(id){['home','hostLobby','playerJoin','hostAuction','playerAuct
 function chooseRole(r){role=r;if(!db){alert('Firebase ຍັງບໍ່ພ້ອມ. ກວດ databaseURL ແລະ Firebase Rules.');return}if(r==='host')createRoom();else showOnly('playerJoin')}
 function backHome(){clearInterval(gameTick);if(roomRef&&unsub)roomRef.off('value',unsub);role=null;roomId=null;playerId=null;state=null;showOnly('home')}
 function createRoom(){roomId=String(Math.floor(1000+Math.random()*9000));playerId='host';roomRef=db.ref('showRooms/'+roomId);roomRef.set({hostId:'host',phase:'lobby',players:{},teams:{},game:{round:0,question:null,endsAt:0,answered:{},effects:{},usedItems:[]},questions:SAMPLE_QUESTIONS,createdAt:Date.now()}).then(()=>{ $('roomCode').textContent=roomId;showOnly('hostLobby');listenRoom();}).catch(e=>alert('ສ້າງຫ້ອງບໍ່ສຳເລັດ: '+e.message))}
-function listenRoom(){if(!roomRef)return;unsub=s=>{state=s.val();if(!state)return;renderAll()};roomRef.on('value',unsub)}
+function listenRoom(){if(!roomRef)return;unsub=s=>{state=s.val();if(!state)return;if(role==='host'&&state.teams){const cleanup={};Object.entries(state.teams).forEach(([id,t])=>{const inv=t.inventory||[];const clean=inv.filter(it=>!REMOVED_ITEM_IDS.includes(it.id));if(clean.length!==inv.length)cleanup['teams/'+id+'/inventory']=clean});if(Object.keys(cleanup).length)roomRef.update(cleanup).catch(err=>console.warn('cleanup removed items',err));}renderAll()};roomRef.on('value',unsub)}
 function joinRoom(){const code=$('joinCode').value.trim(),name=$('playerName').value.trim();if(!/^\d{4}$/.test(code)||!name){$('joinError').textContent='ກະລຸນາໃສ່ລະຫັດ 4 ຕົວ ແລະຊື່';return}roomId=code;roomRef=db.ref('showRooms/'+roomId);roomRef.once('value').then(s=>{const v=s.val();if(!v){$('joinError').textContent='ບໍ່ພົບຫ້ອງນີ້';return}const players=v.players||{};if(Object.keys(players).length>=4){$('joinError').textContent='ຫ້ອງເຕັມ 4 ທີມແລ້ວ';return}if(v.phase!=='lobby'){$('joinError').textContent='ເກມເລີ່ມແລ້ວ';return}playerId='p'+Math.random().toString(36).slice(2,8);const idx=Object.keys(players).length+1;roomRef.child('players/'+playerId).set({id:playerId,name,team:idx,joinedAt:Date.now()}).then(()=>{role='player';listenRoom();showOnly('playerJoin');});}).catch(e=>$('joinError').textContent=e.message)}
 function playersList(){return Object.entries(state?.players||{}).sort((a,b)=>a[1].team-b[1].team)}
 function teamById(id){return state?.players?.[id]}
@@ -379,7 +376,7 @@ function advanceTeamQuestion(id,choice,expired=false){
 }
 function answerQuestion(choice){if(role==='player')advanceTeamQuestion(playerId,choice,false)}
 function renderPlayerQuestion(){const team=state.teams?.[playerId];if(!team)return;renderMoneyWallet('myGameWallet',team,'💰 ເງິນທີມ');$('myTeamTitle').textContent=`🎮 ທີມ ${team.team}: ${team.name}`;$('myScore').textContent=`ຄະແນນ ${team.score}`;$('myRound').textContent=`ຮອບ ${Math.min(15,Number(team.answered||0)+1)}/15`;const q=state.game?.questionByTeam?.[playerId];const lastAnswer=state.game?.answered?.[playerId];const answered=lastAnswer&&Number(lastAnswer.index)===Number(team.answered||0)?lastAnswer:null;const effect=state.game?.effects?.[playerId]||{};const notice=effect.notice;const noticeHTML=notice?`<div class="notice" style="border:2px solid ${notice.lost?'var(--red)':'var(--gold)'};background:${notice.lost?'#511c32':'#302a4f'}"><div style="font-size:clamp(20px,4vw,32px);font-weight:900">${esc(notice.title||'')}</div><p>${esc(notice.detail||'')}</p>${notice.lost?'<div class="big dangertext">❌ ທ່ານແພ້ແລ້ວ</div>':''}</div>`:'';if(!team.alive){const by=effect.eliminatedBy;const killer=by?`<div class="notice" style="border:2px solid var(--red);background:#511c32"><div class="big">💀 ທ່ານຖືກສັງຫານໂຫດ!</div><h2>❌ ທ່ານແພ້ແລ້ວ</h2><p>ຟັງຊັນ: ${esc(ITEMS.find(x=>x.id===by.itemId)?.name||by.itemName||by.itemId||'ບໍ່ຮູ້')}</p><p>ທີມທີ່ສົ່ງມາ: ${esc(by.fromName||'ບໍ່ຮູ້')}</p></div>`:noticeHTML;$('myQuestion').innerHTML=killer;return}if(state.phase==='countdown'){$('myQuestion').innerHTML='<div class="qtext">ເຕັມພ້ອມ… ເກມຈະເລີ່ມໃນໄວໆນີ້!</div>';return}if(!q){$('myQuestion').innerHTML=team.answered>=15?'<h2>✅ ຕອບຄົບ 15 ຂໍ້ແລ້ວ</h2><p>⏳ ລໍຖ້າທີມອື່ນຕອບໃຫ້ຄົບ</p>':'<h2>ລໍຖ້າຄຳຖາມຈາກຜູ້ຄຸມ…</h2>';return}let choices=q.choices||[];const halfKey='halfChoices_'+(team.answered||0);const stored=effect[halfKey];if(stored&&Array.isArray(stored))choices=stored;else if(team.halfLeft>0&&choices.length>2){const wrong=choices.filter(c=>c!==q.answer);choices=[q.answer,...wrong.sort(()=>Math.random()-.5).slice(0,1)];roomRef.child('game/effects/'+playerId+'/'+halfKey).set(choices);roomRef.child('teams/'+playerId+'/halfLeft').set(Math.max(0,team.halfLeft-1));}const disabled=!!answered||!team.alive||Date.now()>=Number(state.game?.deadlines?.[playerId]||0);$('myQuestion').innerHTML=`${noticeHTML}<div class="between"><span class="pill">ຄຳຖາມ ${Math.min(15,(team.answered||0)+1)}/15</span><span class="pill">${answered?(answered.correct?'ຕອບຖືກ':'ຕອບຜິດ'):'ເລືອກຄຳຕອບ'}</span></div><div class="qtext">${q.question}</div><div class="choices">${choices.map((c,i)=>`<button class="choice" ${disabled?'disabled':''} onclick="answerQuestion(${JSON.stringify(c).replace(/"/g,'&quot;')})">${String.fromCharCode(65+i)}. ${c}</button>`).join('')}</div>${answered?`<div class="notice">${answered.correct?'✅ ຖືກຕ້ອງ!':'❌ ຜິດ!'} ${!team.alive?'<b class="dangertext">ທີມທ່ານແພ້ແລ້ວ</b>':''}</div>`:''}`;if(window.MathJax)MathJax.typesetPromise([$ ('myQuestion')]).catch(()=>{})}
-function renderInventory(){const team=state.teams?.[playerId];if(!team)return;const completed=Number(team.answered||0)>=15;const blocked=completed||!team.alive||state.phase!=='game';const items=(team.inventory||[]).map((it,i)=>{const meta=ITEMS.find(x=>x.id===it.id)||{name:it.id,icon:'🎁',desc:''};return `<button class="secondary" ${blocked?'disabled':''} title="${completed?'ຕອບຄົບ 15 ຂໍ້ແລ້ວ ບໍ່ສາມາດໃຊ້ໄອເທັມໄດ້':!team.alive?'ທີມຖືກຄັດອອກ':state.phase!=='game'?'ຍັງບໍ່ແມ່ນເວລາໃຊ້ໄອເທັມ':''}" onclick="useItem(${i})">${meta.icon} ${meta.name} <span class="pill">x${it.charges||1}</span></button>`}).join('');$('myInventory').innerHTML=(completed?'<div class="notice" style="border-color:var(--gold)">🔒 ທ່ານຕອບຄົບ 15 ຂໍ້ແລ້ວ — ລະບົບລັອກການໃຊ້ໄອເທັມທັງໝົດ</div>':'')+(items||'<span class="muted">ຍັງບໍ່ມີໄອເທັມ</span>')}
+function renderInventory(){const team=state.teams?.[playerId];if(!team)return;const completed=Number(team.answered||0)>=15;const blocked=completed||!team.alive||state.phase!=='game';const items=(team.inventory||[]).map((it,i)=>({it,i})).filter(({it})=>!REMOVED_ITEM_IDS.includes(it.id)).map(({it,i})=>{const meta=ITEMS.find(x=>x.id===it.id)||{name:it.id,icon:'🎁',desc:''};return `<button class="secondary" ${blocked?'disabled':''} title="${completed?'ຕອບຄົບ 15 ຂໍ້ແລ້ວ ບໍ່ສາມາດໃຊ້ໄອເທັມໄດ້':!team.alive?'ທີມຖືກຄັດອອກ':state.phase!=='game'?'ຍັງບໍ່ແມ່ນເວລາໃຊ້ໄອເທັມ':''}" onclick="useItem(${i})">${meta.icon} ${meta.name} <span class="pill">x${it.charges||1}</span></button>`}).join('');$('myInventory').innerHTML=(completed?'<div class="notice" style="border-color:var(--gold)">🔒 ທ່ານຕອບຄົບ 15 ຂໍ້ແລ້ວ — ລະບົບລັອກການໃຊ້ໄອເທັມທັງໝົດ</div>':'')+(items||'<span class="muted">ຍັງບໍ່ມີໄອເທັມ</span>')}
 // Shared button-based modal for targeting teams and selecting inventory items.
 function closeModal(){const root=$('modalRoot');if(root)root.innerHTML='';}
 function showChoiceModal(title,options,onSelect){
@@ -398,12 +395,12 @@ function showChoiceModal(title,options,onSelect){
  const cancel=document.createElement('button');cancel.className='secondary';cancel.textContent='✕ ຍົກເລີກ';cancel.addEventListener('click',closeModal);panel.appendChild(cancel);
  overlay.addEventListener('click',e=>{if(e.target===overlay)closeModal()});overlay.appendChild(panel);root.appendChild(overlay);
 }
-function useItem(index){const team=state.teams?.[playerId];if(!team)return;if(Number(team.answered||0)>=15){closeModal();renderInventory();alert('🔒 ທ່ານຕອບຄົບ 15 ຂໍ້ແລ້ວ ບໍ່ສາມາດໃຊ້ໄອເທັມໄດ້');return}if(!team.alive||state.phase!=='game')return;if(!team.inventory?.[index])return;const inv=team.inventory[index],meta=ITEMS.find(x=>x.id===inv.id);if(!meta)return;roomRef.child('game/effects/'+playerId+'/notice').set({id:Date.now(),title:`✨ ກຳລັງໃຊ້ຟັງຊັນ: ${meta.name}`,detail:`ທີມ ${team.team}: ${team.name} ກຳລັງໃຊ້ ${meta.name}`,itemId:inv.id,from:playerId,at:Date.now(),lost:false});pushGameNotice({from:playerId,itemId:inv.id,itemName:meta.name,status:'✨ ກຳລັງໃຊ້',kind:'function',message:`ທີມ ${team.team}: ${team.name} ເລີ່ມໃຊ້ຟັງຊັນ ${meta.name}`});if(meta.kind==='armor'){alert('🛡️ ເກາະຈະປ້ອງກັນອັດຕະໂນມັດເມື່ອຖືກໂຈມຕີ');return}let target=null;if(meta.kind==='attack'||['parallel','heartbox','poison','hellheart','timeminus3','timeminus5','timeminus7','timeminus10','kill','meme','virus','sandstorm','meteor','flip','blink'].includes(inv.id)){const opts=Object.entries(state.teams).filter(([id,t])=>id!==playerId&&t.alive).map(([id,t])=>({id,name:`ທີມ ${t.team}: ${t.name}`}));if(!opts.length){alert('ບໍ່ມີທີມເປົ້າໝາຍ');return}showChoiceModal('🎯 ເລືອກທີມເປົ້າໝາຍ',opts.map(o=>({label:o.name,value:o.id})),id=>useItemTarget(index,id));return}
+function useItem(index){const team=state.teams?.[playerId];if(!team)return;if(Number(team.answered||0)>=15){closeModal();renderInventory();alert('🔒 ທ່ານຕອບຄົບ 15 ຂໍ້ແລ້ວ ບໍ່ສາມາດໃຊ້ໄອເທັມໄດ້');return}if(!team.alive||state.phase!=='game')return;if(!team.inventory?.[index])return;const inv=team.inventory[index],meta=ITEMS.find(x=>x.id===inv.id);if(!meta)return;roomRef.child('game/effects/'+playerId+'/notice').set({id:Date.now(),title:`✨ ກຳລັງໃຊ້ຟັງຊັນ: ${meta.name}`,detail:`ທີມ ${team.team}: ${team.name} ກຳລັງໃຊ້ ${meta.name}`,itemId:inv.id,from:playerId,at:Date.now(),lost:false});pushGameNotice({from:playerId,itemId:inv.id,itemName:meta.name,status:'✨ ກຳລັງໃຊ້',kind:'function',message:`ທີມ ${team.team}: ${team.name} ເລີ່ມໃຊ້ຟັງຊັນ ${meta.name}`});if(meta.kind==='armor'){alert('🛡️ ເກາະຈະປ້ອງກັນອັດຕະໂນມັດເມື່ອຖືກໂຈມຕີ');return}let target=null;if(meta.kind==='attack'||['parallel','heartbox','poison','timeminus3','timeminus5','timeminus7','timeminus10','kill','meme','virus','sandstorm','meteor','flip','blink'].includes(inv.id)){const opts=Object.entries(state.teams).filter(([id,t])=>id!==playerId&&t.alive).map(([id,t])=>({id,name:`ທີມ ${t.team}: ${t.name}`}));if(!opts.length){alert('ບໍ່ມີທີມເປົ້າໝາຍ');return}showChoiceModal('🎯 ເລືອກທີມເປົ້າໝາຍ',opts.map(o=>({label:o.name,value:o.id})),id=>useItemTarget(index,id));return}
 if(inv.id.startsWith('timeplus')){
  const seconds=Number(inv.id.replace('timeplus',''))||3;
  roomRef.update({['teams/'+playerId+'/extraTime']:(team.extraTime||0)+seconds,...(state.phase==='game'&&state.game?.deadlines?.[playerId]?{['game/deadlines/'+playerId]:state.game.deadlines[playerId]+seconds*1000}:{})}).then(()=>consumeItem(index));return;
  }
- if(inv.id==='penalty'){roomRef.child('game/penaltyMode').set(true).then(()=>consumeItem(index));return}if(inv.id==='aura'){updateScore(playerId,1);consumeItem(index);return}if(inv.id==='steal'){const updates={};let stolen=0;Object.entries(state.teams).forEach(([id,t])=>{if(id!==playerId&&t.score>0){updates['teams/'+id+'/score']=t.score-1;stolen++;pushGameNotice({from:playerId,to:id,itemId:inv.id,itemName:meta.name,status:'⚠️ ຖືກຫັກຄະແນນ',kind:'impact',message:`ທີມ ${team.team}: ${team.name} ໃຊ້ ${meta.name} ເຮັດໃຫ້ທີມ ${t.team}: ${t.name} ເສຍ 1 ຄະແນນ`})}});updates['teams/'+playerId+'/score']=team.score+stolen;roomRef.update(updates).then(()=>consumeItem(index));return}
+ if(inv.id==='aura'){updateScore(playerId,1);consumeItem(index);return}if(inv.id==='steal'){const updates={};let stolen=0;Object.entries(state.teams).forEach(([id,t])=>{if(id!==playerId&&t.score>0){updates['teams/'+id+'/score']=t.score-1;stolen++;pushGameNotice({from:playerId,to:id,itemId:inv.id,itemName:meta.name,status:'⚠️ ຖືກຫັກຄະແນນ',kind:'impact',message:`ທີມ ${team.team}: ${team.name} ໃຊ້ ${meta.name} ເຮັດໃຫ້ທີມ ${t.team}: ${t.name} ເສຍ 1 ຄະແນນ`})}});updates['teams/'+playerId+'/score']=team.score+stolen;roomRef.update(updates).then(()=>consumeItem(index));return}
 if(inv.id==='god'){const max=Math.max(...Object.values(state.teams).map(t=>t.score));roomRef.child('teams/'+playerId+'/score').set(max).then(()=>consumeItem(index));return}
 if(inv.id==='parallel'&&target){const updates={};updates['teams/'+playerId+'/score']=state.teams[target].score;updates['teams/'+target+'/score']=team.score;roomRef.update(updates).then(()=>consumeItem(index));return}
 if(inv.id==='half'||inv.id==='cut'){roomRef.child('teams/'+playerId+'/halfLeft').set(inv.id==='half'?3:1).then(()=>consumeItem(index));return}
@@ -415,20 +412,21 @@ if(inv.id==='zombie'){const used=state.game?.usedItems||[];if(!used.length){aler
 if(inv.id==='heartbox'&&target){const targetTeam=state.teams[target];const invs=targetTeam.inventory||[];if(!invs.length){alert('ທີມນີ້ບໍ່ມີໄອເທັມ');return}const stealId=prompt('ໄອເທັມທີ່ຂະໂມຍໄດ້:\n'+invs.map(x=>x.id).join('\n'));const i=invs.findIndex(x=>x.id===stealId);if(i>=0){const copy=JSON.parse(JSON.stringify(invs[i]));invs.splice(i,1);const updates={};updates['teams/'+target+'/inventory']=invs;updates['teams/'+playerId+'/inventory']=[...team.inventory,copy];roomRef.update(updates).then(()=>consumeItem(index))}return}
 if(target){applyAttack(inv.id,playerId,target).then(()=>consumeItem(index));return}
 consumeItem(index)}
-function useItemTarget(index,target){const currentTeam=state.teams?.[playerId];if(!currentTeam||Number(currentTeam.answered||0)>=15||!currentTeam.alive||state.phase!=='game'){closeModal();renderInventory();if(currentTeam&&Number(currentTeam.answered||0)>=15)alert('🔒 ທ່ານຕອບຄົບ 15 ຂໍ້ແລ້ວ ບໍ່ສາມາດໃຊ້ໄອເທັມໄດ້');return}const meta=ITEMS.find(x=>x.id===currentTeam.inventory?.[index]?.id);if(!meta)return;const actor=state.teams?.[playerId],targetTeam=state.teams?.[target];pushGameNotice({from:playerId,to:target,itemId:meta.id,itemName:meta.name,status:'🎯 ເລືອກເປົ້າໝາຍ',kind:'impact',message:`ທີມ ${actor?.team}: ${actor?.name} ເລືອກໃຊ້ ${meta.name} ກັບ ທີມ ${targetTeam?.team}: ${targetTeam?.name}`});if(meta.id==='heartbox'){const invs=state.teams[target]?.inventory||[];if(!invs.length){alert('ທີມນີ້ບໍ່ມີໄອເທັມ');return}showChoiceModal('🎁 ເລືອກໄອເທັມ',invs.map((x,i)=>({label:(ITEMS.find(z=>z.id===x.id)?.name||x.id),value:i})),i=>{const own=state.teams[playerId].inventory.slice(),other=state.teams[target].inventory.slice();const stolen=other.splice(i,1)[0];roomRef.update({['teams/'+target+'/inventory']:other,['teams/'+playerId+'/inventory']:[...own,stolen]}).then(()=>consumeItem(index))});return}if(meta.id==='parallel'){const a=state.teams[playerId].score,b=state.teams[target].score;roomRef.update({['teams/'+playerId+'/score']:b,['teams/'+target+'/score']:a}).then(()=>consumeItem(index));return}applyAttack(meta.id,playerId,target).then(()=>consumeItem(index))}
+function useItemTarget(index,target){const currentTeam=state.teams?.[playerId];if(!currentTeam||Number(currentTeam.answered||0)>=15||!currentTeam.alive||state.phase!=='game'){closeModal();renderInventory();if(currentTeam&&Number(currentTeam.answered||0)>=15)alert('🔒 ທ່ານຕອບຄົບ 15 ຂໍ້ແລ້ວ ບໍ່ສາມາດໃຊ້ໄອເທັມໄດ້');return}const meta=ITEMS.find(x=>x.id===currentTeam.inventory?.[index]?.id);if(!meta)return;const actor=state.teams?.[playerId],targetTeam=state.teams?.[target];pushGameNotice({from:playerId,to:target,itemId:meta.id,itemName:meta.name,status:'🎯 ເລືອກເປົ້າໝາຍ',kind:'impact',message:`ທີມ ${actor?.team}: ${actor?.name} ເລືອກໃຊ້ ${meta.name} ກັບ ທີມ ${targetTeam?.team}: ${targetTeam?.name}`});if(meta.id==='heartbox'){const invs=state.teams[target]?.inventory||[];if(!invs.length){alert('ທີມນີ້ບໍ່ມີໄອເທັມ');return}showChoiceModal('🎁 ເລືອກໄອເທັມ',invs.map((x,i)=>({label:(ITEMS.find(z=>z.id===x.id)?.name||x.id),value:i})),i=>{const own=state.teams[playerId].inventory.slice(),other=state.teams[target].inventory.slice();const stolen=other.splice(i,1)[0];roomRef.update({['teams/'+target+'/inventory']:other,['teams/'+playerId+'/inventory']:[...own,stolen]}).then(()=>consumeItem(index))});return}if(meta.id==='parallel'){const a=state.teams[playerId].score,b=state.teams[target].score;roomRef.update({['teams/'+playerId+'/score']:b,['teams/'+target+'/score']:a}).then(()=>consumeItem(index));return}applyAttack(meta.id,playerId,target).then(accepted=>{if(accepted)consumeItem(index)})}
 function updateScore(id,delta){roomRef.child('teams/'+id+'/score').set((state.teams[id].score||0)+delta)}
 function consumeItem(index){const team=state.teams?.[playerId];if(!team)return;const inv=[...team.inventory],used=inv[index];if(!used)return;const charges=(used.charges||1)-1;if(charges<=0)inv.splice(index,1);else inv[index]={...used,charges};roomRef.update({['teams/'+playerId+'/inventory']:inv,['game/usedItems']:[...(state.game?.usedItems||[]),used.id]})}
 function applyAttack(itemId,from,to){
- const victim=state.teams?.[to];if(!victim)return Promise.resolve();
+ const victim=state.teams?.[to];if(!victim||!victim.alive)return Promise.resolve(false);
  const armorIds=(victim.inventory||[]).filter(x=>['shield','reflect','diamondarmor','ironarmor','scatterarmor'].includes(x.id)).map(x=>x.id);
- // ຖ້າມີເກາະ ໃຫ້ເລືອກວ່າຈະໃຊ້ເກາະອັນໃດ ພາຍໃນ 5 ວິນາທີ
  if(armorIds.length){
-  const existing=state.game?.effects?.[to]?.incomingPrompt;
-  if(existing?.status==='pending'||existing?.status==='resolving')return Promise.resolve();
+  const promptRef=roomRef.child('game/effects/'+to+'/incomingPrompt');
   const prompt={itemId,from,armorIds:[...new Set(armorIds)],createdAt:Date.now(),expiresAt:Date.now()+5000,status:'pending'};
-  return roomRef.child('game/effects/'+to+'/incomingPrompt').set(prompt);
+  return promptRef.transaction(current=>{
+   if(current&&(current.status==='pending'||current.status==='resolving'))return;
+   return prompt;
+  }).then(result=>Promise.resolve(!!result.committed));
  }
- return doAttack(itemId,from,to);
+ return doAttack(itemId,from,to).then(accepted=>!!accepted);
 }
 function resolveIncomingAttack(armorChoice=null){
  if(role!=='player'||!playerId)return;
@@ -492,12 +490,11 @@ function doAttack(itemId,from,to){
  const now=Date.now();
  const directUpdates={};
  if(itemId==='kill')directUpdates['teams/'+to+'/alive']=false;
- else if(itemId==='hellheart')directUpdates['teams/'+to+'/hellheart']=(Number(victim.hellheart)||0)+1;
  else if(itemId.startsWith('timeminus')){
   const sec=Number(itemId.replace('timeminus',''))||3;
   directUpdates['teams/'+to+'/timePenalty']={seconds:sec,remaining:3};
   if(state.phase==='game'&&state.game?.deadlines?.[to])directUpdates['game/deadlines/'+to]=Math.max(now+1000,state.game.deadlines[to]-sec*1000);
- }else if(itemId==='penalty')directUpdates['game/penaltyMode']=true;
+ }
 
  // ອັບເດດ effect ຂອງທີມເປົ້າໝາຍດ້ວຍ transaction ເພື່ອບໍ່ໃຫ້ການໂຈມຕີທີ່ເຂົ້າພ້ອມກັນຂຽນທັບກັນ.
  const effectRef=roomRef.child('game/effects/'+to);
@@ -507,18 +504,50 @@ function doAttack(itemId,from,to){
   if(itemId==='kill'){fx.eliminated=true;fx.eliminatedBy={itemId,from,fromName:sourceName,itemName:actionName,at:now};}
   if(itemId==='poison')fx.poison=true;
   if(['virus','sandstorm','meteor','flip','blink'].includes(itemId)||/^meme\d*$/.test(itemId)){
-   fx.visual=itemId;
-   fx.visualUntil=now+7000;
+   const visualQueue=Array.isArray(fx.visualQueue)?fx.visualQueue.slice():[];
+   if(fx.visual&&Number(fx.visualUntil||0)>now){
+    visualQueue.push({effect:itemId,queuedAt:now,from,itemId});
+    fx.visualQueue=visualQueue;
+   }else{
+    fx.visual=itemId;
+    fx.visualUntil=now+7000;
+    fx.visualQueue=visualQueue;
+   }
   }
   return fx;
  }).then(result=>{
-  if(!result.committed)return;
+  if(!result.committed)return false;
   const finish=Object.keys(directUpdates).length?roomRef.update(directUpdates):Promise.resolve();
   const noticeMessage=itemId==='kill'?`${sourceName} ໃຊ້ ${actionName} ແລະຄັດອອກ ທີມ ${victim.team}: ${victim.name}`:`${sourceName} ໃຊ້ ${actionName} ກັບ ທີມ ${victim.team}: ${victim.name}`;
-  return finish.then(()=>pushGameNotice({from,to,itemId,itemName:actionName,status:itemId==='kill'?'💀 ຖືກຄັດອອກ':'⚠️ ມີຜົນກະທົບ',kind:itemId==='kill'?'loss':'impact',message:noticeMessage}));
+  return finish.then(()=>pushGameNotice({from,to,itemId,itemName:actionName,status:itemId==='kill'?'💀 ຖືກຄັດອອກ':'⚠️ ມີຜົນກະທົບ',kind:itemId==='kill'?'loss':'impact',message:noticeMessage})).then(()=>true);
  }).catch(err=>{console.error('doAttack failed',err);throw err;});
 }
-function showEffect(id,effect){if(playerId!==id)return;const root=$('overlayRoot');const fx=state?.game?.effects?.[id]||{};const until=Number(fx.visualUntil||0);if(until<=Date.now())return;root.innerHTML='';if(localOverlayTimer){clearTimeout(localOverlayTimer);localOverlayTimer=null}if(effect.startsWith('meme')){const memeNo=Number(effect.slice(4))||1;const meme=MEMES[memeNo-1]||MEMES[0];root.innerHTML=`<div class="overlay"><div><div class="meme">${meme[0]}</div><div class="big">${meme[0]} ${esc(meme[1])}</div></div></div>`}else if(effect==='meteor'){root.innerHTML='<div class="overlay"><div class="big">☄️</div></div>'}else if(effect==='virus'){document.body.classList.add('fall')}else if(effect==='sandstorm'){document.body.classList.add('storm','sand')}else if(effect==='flip'){const stage=document.querySelector('.wrap');if(stage){stage.classList.add('flip');let flips=0;const flipTimer=setInterval(()=>{stage.classList.toggle('flip');if(++flips>=3)clearInterval(flipTimer)},1750);setTimeout(()=>{clearInterval(flipTimer);stage.classList.remove('flip')},7000)}}else if(effect==='blink'){document.body.classList.add('blink')}localOverlayTimer=setTimeout(()=>{root.innerHTML='';document.body.classList.remove('fall','storm','sand','flip','blink');document.querySelector('.wrap')?.classList.remove('flip');localOverlayTimer=null;const latest=state?.game?.effects?.[id]||{};if(latest.visual===effect&&Number(latest.visualUntil||0)<=Date.now())roomRef.child('game/effects/'+id+'/visual').remove()},Math.max(0,until-Date.now()))}
+function showEffect(id,effect){
+ if(playerId!==id)return;
+ const root=$('overlayRoot');const fx=state?.game?.effects?.[id]||{};const until=Number(fx.visualUntil||0);
+ if(until<=Date.now())return;
+ root.innerHTML='';if(localOverlayTimer){clearTimeout(localOverlayTimer);localOverlayTimer=null}
+ if(effect.startsWith('meme')){const memeNo=Number(effect.slice(4))||1;const meme=MEMES[memeNo-1]||MEMES[0];root.innerHTML=`<div class="overlay"><div><div class="meme">${meme[0]}</div><div class="big">${meme[0]} ${esc(meme[1])}</div></div></div>`}
+ else if(effect==='meteor'){root.innerHTML='<div class="overlay"><div class="big">☄️</div></div>'}
+ else if(effect==='virus'){document.body.classList.add('fall')}
+ else if(effect==='sandstorm'){document.body.classList.add('storm','sand')}
+ else if(effect==='flip'){const stage=document.querySelector('.wrap');if(stage){stage.classList.add('flip');let flips=0;const flipTimer=setInterval(()=>{stage.classList.toggle('flip');if(++flips>=3)clearInterval(flipTimer)},1750);setTimeout(()=>{clearInterval(flipTimer);stage.classList.remove('flip')},7000)}}
+ else if(effect==='blink'){document.body.classList.add('blink')}
+ localOverlayTimer=setTimeout(()=>{
+  root.innerHTML='';document.body.classList.remove('fall','storm','sand','flip','blink');document.querySelector('.wrap')?.classList.remove('flip');localOverlayTimer=null;
+  const effectRef=roomRef.child('game/effects/'+id);
+  effectRef.transaction(current=>{
+   if(!current)return current;
+   if(current.visual!==effect||Number(current.visualUntil||0)>Date.now())return;
+   const queue=Array.isArray(current.visualQueue)?current.visualQueue.slice():[];
+   const next=queue.shift();
+   current.visualQueue=queue;
+   if(next&&next.effect){current.visual=next.effect;current.visualUntil=Date.now()+7000;}
+   else{delete current.visual;delete current.visualUntil;}
+   return current;
+  }).catch(err=>console.error('advance visual queue failed',err));
+ },Math.max(0,until-Date.now()));
+}
 function toggleHostScores(){
  hostScoresVisible=!hostScoresVisible;
  const board=$('hostScoreBoard'),btn=$('toggleHostScoresBtn');
