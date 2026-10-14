@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="lo">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Game Show Battle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+:root{--bg:#111426;--panel:#202541;--panel2:#292f50;--pink:#ff5ebc;--cyan:#53e5ed;--gold:#ffd166;--text:#f7f7ff;--muted:#b7bfdc;--red:#ff5f70;--green:#59e3a5}
+*{box-sizing:border-box}body{margin:0;font-family:'Phetsarath OT',sans-serif;background:radial-gradient(circle at 15% 0,#35305e 0,#111426 42%,#090b16 100%);color:var(--text);font-family:'Phetsarath OT',sans-serif;min-height:100vh}button,input,textarea,select{font-family:'Phetsarath OT',sans-serif;font-size:inherit}button{border:0;border-radius:12px;padding:10px 14px;background:linear-gradient(135deg,#ff5ebc,#9b6bff);color:white;font-weight:700;cursor:pointer;box-shadow:0 5px 18px #0004}button:disabled{opacity:.4;cursor:not-allowed}button.secondary{background:#3b4268}button.cyan{background:linear-gradient(135deg,#26cbd7,#387de8)}button.gold{background:linear-gradient(135deg,#ffca55,#ff8c42);color:#25182a}button.danger{background:linear-gradient(135deg,#ff536c,#bd2759)}input,textarea,select{width:100%;padding:11px;border:1px solid #4a5075;border-radius:10px;background:#11162c;color:white}textarea{min-height:140px}.wrap{max-width:1450px;margin:auto;padding:20px}.brand{text-align:center;margin:10px 0 22px}.brand h1{font-size:clamp(28px,5vw,48px);margin:0;background:linear-gradient(90deg,var(--cyan),#fff,var(--pink));color:transparent;background-clip:text}.brand p{color:var(--muted);margin:5px}.panel{background:#1c2239eF;border:1px solid #41496d;border-radius:18px;padding:18px;box-shadow:0 14px 35px #0004}.hidden{display:none!important}.grid{display:grid;gap:14px}.roles{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));max-width:760px;margin:20px auto}.role{padding:28px 18px;text-align:center;min-height:170px}.role .emoji{font-size:42px}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.between{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.muted{color:var(--muted)}.roomcode{font-size:40px;letter-spacing:10px;color:var(--gold);font-weight:900}.players{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));margin:15px 0}.player{background:#282e4b;border:1px solid #4c547c;border-radius:13px;padding:14px}.pill{display:inline-block;padding:4px 9px;border-radius:20px;background:#3a4165;color:var(--cyan);font-size:13px}.items{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));margin-top:15px}.item{border:1px solid #495174;background:linear-gradient(145deg,#292f50,#1b2037);border-radius:14px;padding:14px}.item h3{margin:6px 0}.teamboard{grid-template-columns:repeat(2,minmax(0,1fr))}.teamview{min-width:0}.teamview .choices{grid-template-columns:repeat(2,minmax(0,1fr))}.teamview{min-height:250px;border:2px solid #48517b;border-radius:14px;padding:12px;background:#161b30;overflow:hidden}.teamview h3{margin:0 0 8px;color:var(--cyan)}.qtext{font-size:clamp(18px,2.2vw,28px);line-height:1.6}.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:14px}.choice{background:#333b61;text-align:left;min-height:48px}.choice:disabled{opacity:.8}.gameLayout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(240px,1fr);gap:14px}.inventory{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:8px}.inventory button{font-size:14px;text-align:left}.timer{font-size:28px;font-weight:900;color:var(--gold)}.status{padding:8px 12px;border-radius:20px;background:#353b5c;color:var(--muted);font-size:13px}.notice{padding:12px;border-radius:12px;background:#302a4f;border:1px solid #5d4d91;margin:10px 0}.overlay{position:fixed;inset:0;z-index:1000;pointer-events:none;background:#050611f5;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;animation:fade .2s}#modalRoot .overlay{pointer-events:auto}#modalRoot .overlay .panel,#modalRoot .overlay button{pointer-events:auto}.overlay .big{font-size:clamp(32px,7vw,90px);font-weight:900}.meme{font-size:clamp(40px,10vw,120px)}@keyframes fade{from{opacity:0}to{opacity:1}}.fall{animation:fall 10s linear}@keyframes fall{0%{transform:translateY(-15px) rotate(0)}100%{transform:translateY(110vh) rotate(20deg)}}.sand{filter:sepia(.8) contrast(1.8);background-image:repeating-linear-gradient(15deg,#d4a15a22 0 2px,transparent 2px 8px)}.flip{transform:rotate(180deg)}.blink{animation:blink .5s steps(2,start) infinite}@keyframes blink{to{visibility:hidden}}.storm:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:800;background:repeating-linear-gradient(110deg,transparent 0 18px,#c6a16b33 19px 22px);animation:fade .3s infinite alternate}.blackout{background:#000!important;color:#000!important}.small{font-size:13px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.dangertext{color:var(--red)}.wallet-panel{margin:12px 0;background:linear-gradient(135deg,#182f39,#1c2239);border:1px solid #3f8b85;border-radius:14px;padding:13px}.wallet-line{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}.wallet-value{font-size:clamp(18px,2.5vw,25px);font-weight:900;color:var(--gold);font-variant-numeric:tabular-nums}.money-track{height:12px;overflow:hidden;border-radius:99px;background:#0a1020;border:1px solid #43516b}.money-fill{height:100%;width:100%;border-radius:99px;background:linear-gradient(90deg,#32d296,#b7f36b);transition:width .25s ease}.money-fill.low{background:linear-gradient(90deg,#ff536c,#ffca55)}.wallet-card{background:#171d32;border:1px solid #41496d;border-radius:12px;padding:11px}.wallet-card .money-track{height:8px}.price-line{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}.price-number{font-size:22px;font-weight:900;color:var(--gold)}.buy-item{width:100%;margin-top:8px;background:linear-gradient(135deg,#24d18c,#278bca);font-size:16px}.buy-item:disabled{filter:grayscale(.4);opacity:.55}.auction-timer{font-size:clamp(26px,4vw,38px);font-weight:900;color:var(--gold);font-variant-numeric:tabular-nums}.auction-event{min-height:48px}.item{transition:border-color .2s,transform .2s}.item:hover{border-color:var(--cyan);transform:translateY(-2px)}@media(max-width:760px){.gameLayout{grid-template-columns:1fr}.teamboard{grid-template-columns:1fr}.wrap{padding:10px}.panel{padding:13px}.choices{grid-template-columns:1fr 1fr}.roomcode{font-size:32px}}
+100%{transform:scale(1);filter:brightness(1)}}  .auction-tabs{display:flex;gap:8px;overflow-x:auto;padding:12px 0;position:sticky;top:0;background:#1c2239;z-index:5}.auction-tabs button{white-space:nowrap;background:#333b61}.auction-tabs button.selected{background:linear-gradient(135deg,#26cbd7,#9b6bff)}.question-auction{grid-column:span 1}.question-auction .qtext{font-size:17px}.question-auction .choices{grid-template-columns:1fr 1fr}.question-auction .choice{padding:7px;font-size:13px;min-height:35px}.target-buttons{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px;margin-top:14px}.target-buttons button{min-height:60px}.winner-panel{margin-top:14px;text-align:center;overflow:hidden}.winner-pyramid{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:auto auto auto;align-items:stretch;gap:12px;margin:22px auto;max-width:900px}.winner-step.rank1{grid-column:2;grid-row:1}.winner-step.rank2{grid-column:1;grid-row:2}.winner-step.rank3{grid-column:3;grid-row:2}.winner-step.rank4{grid-column:2;grid-row:3}.winner-step.reveal-hidden{visibility:hidden;opacity:0;animation:none}@media(max-width:600px){.winner-pyramid{gap:6px}.winner-step{padding:9px 5px;border-radius:12px}.winner-place{font-size:clamp(13px,3.4vw,20px)}.winner-name{font-size:clamp(12px,3vw,18px);overflow-wrap:anywhere}.winner-score{font-size:12px}}.winner-step{width:min(100%,440px);padding:15px;border:2px solid #5b648e;border-radius:16px;background:linear-gradient(135deg,#252c4b,#171b30);box-shadow:0 10px 25px #0005;animation:winnerIn .8s cubic-bezier(.2,.8,.2,1) both}.winner-step.rank1{border-color:#ffd166;background:linear-gradient(135deg,#72521b,#30243b);width:min(100%,500px)}.winner-step.rank2{border-color:#c9d4e8;width:min(100%,460px)}.winner-step.rank3{border-color:#d99a6e;width:min(100%,420px)}.winner-step.rank4{border-style:dashed;opacity:.92;width:min(100%,380px)}.winner-place{font-size:clamp(22px,4vw,34px);font-weight:900}.winner-name{font-size:clamp(20px,3.5vw,30px);font-weight:900;margin:4px 0}.winner-score{color:var(--gold);font-size:18px}@keyframes winnerIn{from{opacity:0;transform:translateY(35px) scale(.88);filter:blur(5px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}} 
+.host-score-board{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0}.host-score-card{padding:12px;border:1px solid #53618d;border-radius:12px;background:#151b30}.host-score-value{font-size:26px;font-weight:900;color:var(--gold)}.live-feed{display:grid;gap:8px;max-height:300px;overflow:auto}.live-event{padding:10px 12px;border-radius:10px;background:#171d32;border-left:4px solid var(--cyan)}.live-event.impact{border-left-color:var(--gold)}.live-event.loss{border-left-color:var(--red)}.winner-screen-overlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;overflow:auto;padding:clamp(10px,3vw,30px);background:radial-gradient(circle at 50% 0,#39305f 0,#111426 52%,#050611 100%);color:#f7f7ff;text-align:center}
+.winner-screen-overlay.hidden{display:none!important}.winner-screen-inner{width:min(1100px,100%);margin:auto}.winner-screen-title{font-size:clamp(27px,5vw,52px);margin:0 0 8px;color:#ffd166;text-shadow:0 0 24px #ffd16644}.winner-screen-subtitle{color:#b7bfdc;margin:0}.winner-screen-overlay .winner-pyramid{width:100%;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto auto;gap:clamp(7px,2vw,18px);margin:clamp(15px,3vh,28px) auto}.winner-screen-overlay .winner-step{min-width:0;align-self:center}.winner-screen-overlay .winner-step.reveal-hidden{visibility:hidden;opacity:0;animation:none}.winner-screen-overlay .winner-step.revealed{visibility:visible;animation:winnerIn .9s cubic-bezier(.2,.8,.2,1) both}.winner-screen-overlay .winner-name{overflow-wrap:anywhere}.winner-screen-close{margin:4px auto 10px;min-width:180px}@media(max-width:600px){.winner-screen-overlay{padding:10px}.winner-screen-overlay .winner-pyramid{gap:6px}.winner-screen-overlay .winner-step{padding:8px 4px}.winner-screen-overlay .winner-place{font-size:clamp(12px,3.3vw,20px)}.winner-screen-overlay .winner-name{font-size:clamp(11px,2.9vw,17px)}.winner-screen-overlay .winner-score{font-size:12px}}
+
+/* Auction cards: keep long question/choice text inside its own card. */
+.question-auction{min-width:0;overflow:hidden;}
+.question-auction .qtext{
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;
+  overflow:hidden;text-overflow:ellipsis;overflow-wrap:anywhere;word-break:normal;
+  max-width:100%;max-height:4.8em;line-height:1.6;
+}
+.question-auction .choices{min-width:0;grid-template-columns:repeat(2,minmax(0,1fr));}
+.question-auction .choice{
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+  min-width:0;max-width:100%;max-height:3.2em;overflow:hidden;text-overflow:ellipsis;
+  overflow-wrap:anywhere;word-break:normal;line-height:1.55;white-space:normal;
+}
+.question-auction .qtext mjx-container,
+.question-auction .choice mjx-container{max-width:100%;}
+@media(max-width:600px){
+  .question-auction .qtext{-webkit-line-clamp:3;max-height:4.5em;font-size:15px;}
+  .question-auction .choices{gap:6px;}
+  .question-auction .choice{padding:6px;font-size:12px;-webkit-line-clamp:2;max-height:3em;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="brand"><h1>⚡ GAME SHOW BATTLE ⚡</h1><p>ເກມໂຊວ໌ແຂ່ງຂັນ • ໄອເທັມ • ຕອບຄຳຖາມ</p></header>
+  <div class="between"><span id="connection" class="status">ກຳລັງກວດກາ Firebase…</span><button class="secondary small" onclick="showSetup()">⚙ ຕັ້ງຄ່າ / ຄູ່ມື</button></div>
+  <section id="home">
+    <div class="grid roles">
+      <button class="panel role" onclick="chooseRole('host')"><div class="emoji">🎙️</div><h2>ຜູ້ຄຸມລະບົບ</h2><p class="muted">ສ້າງຫ້ອງ ແລະ ຄວບຄຸມເກມ</p></button>
+      <button class="panel role" onclick="chooseRole('player')"><div class="emoji">🎮</div><h2>ຜູ້ຫຼິ້ນ</h2><p class="muted">ເຂົ້າຫ້ອງ ແລະ ແຂ່ງຂັນ</p></button>
+    </div>
+  </section>
+  <section id="hostLobby" class="panel hidden">
+    <div class="between"><div><h2>🎙️ ຫ້ອງຜູ້ຄຸມ</h2><div class="muted">ລະຫັດຫ້ອງ</div><div class="roomcode" id="roomCode">----</div></div><button class="secondary" onclick="backHome()">ກັບໜ້າຫຼັກ</button></div>
+    <div class="notice">ໃຫ້ຜູ້ຫຼິ້ນ 4 ທີມ ໃສ່ລະຫັດຫ້ອງນີ້. ຕ້ອງຄົບ 4 ຄົນກ່ອນເລີ່ມເກມ.</div>
+    <div id="lobbyPlayers" class="grid players"></div>
+    <div class="row"><button id="startGame" onclick="goToAuction()" disabled>➡️ ໄປໜ້າປະມູນ</button><button class="secondary" onclick="resetRoom()">ຣີເຊັດຫ້ອງ</button></div>
+  </section>
+  <section id="playerJoin" class="panel hidden">
+    <div class="between"><h2>🎮 ເຂົ້າຫ້ອງ</h2><button class="secondary" onclick="backHome()">ກັບໜ້າຫຼັກ</button></div>
+    <label>ລະຫັດຫ້ອງ 4 ຕົວເລກ</label><input id="joinCode" inputmode="numeric" maxlength="4" placeholder="1234">
+    <label style="display:block;margin-top:12px">ຊື່ທີມ / ຜູ້ຫຼິ້ນ</label><input id="playerName" maxlength="24" placeholder="ຕັ້ງຊື່ທີມ">
+    <button style="margin-top:14px" onclick="joinRoom()">ເຂົ້າຫ້ອງ</button><p id="joinError" class="dangertext"></p>
+  </section>
+  <section id="hostAuction" class="panel hidden">
+    <div class="between"><div><h2>🎁 ໜ້າປະມູນໄອເທັມ</h2><p class="muted">ລາຄາ ແລະ ເງິນຂອງທັງ 4 ທີມຈະອັບເດດທັນທີ</p></div><div style="text-align:right"><div id="hostAuctionTimer" class="auction-timer">03:00</div><span class="pill" id="auctionTeamCount">ຄົບ 4 ທີມ</span> <span class="pill" id="hostAuctionStatus">ກຳລັງປະມູນ</span></div></div>
+    <div class="notice">💡 ລາຄາເລີ່ມຈາກ 0. ກົດປຸ່ມ + ແຕ່ລະຄັ້ງ ລາຄາຈະເພີ່ມ 1 ເຫຼຽນ ແລະທີມທີ່ກົດຈະຈ່າຍລາຄາໃໝ່ແລະໄດ້ໄອເທັມ 1 ອັນ. ເງິນທີ່ຈ່າຍໄປແລ້ວບໍ່ຄືນໃຫ້ຜູ້ຊື້ກ່ອນ.</div>
+    <h3>💰 ເງິນຄົງເຫຼືອຂອງ 4 ທີມ</h3><div id="hostAuctionMoneyBoard" class="grid players"></div>
+    <div id="hostAuctionEvent" class="notice auction-event">ການຊື້ແລະການປ່ຽນລາຄາຈະສະແດງຢູ່ບ່ອນນີ້</div>
+    <h3>ລາຍການໄອເທັມ • ລາຄາແບບເວລາຈິງ</h3><div id="hostAuctionTabs" class="auction-tabs"></div><div id="hostAuctionItems" class="grid items"></div>
+    <div class="actions"><button id="beginGameBtn" onclick="beginGame()">▶️ ເລີ່ມເກມ</button><button class="secondary" onclick="backToLobby()">ກັບຫ້ອງລໍຖ້າ</button></div>
+  </section>
+  <section id="playerAuction" class="panel hidden">
+    <div class="between"><div><h2>🎁 ໜ້າປະມູນໄອເທັມ</h2><p class="muted">ກົດ + ເພື່ອຊື້ 1 ອັນໃນລາຄາໃໝ່. ລາຄາອັບເດດພ້ອມກັນທັງ 4 ທີມ.</p></div><div style="text-align:right"><div id="playerAuctionTimer" class="auction-timer">03:00</div><span class="pill" id="playerAuctionStatus">ກຳລັງປະມູນ</span></div></div>
+    <div id="playerAuctionWallet" class="wallet-panel"></div>
+    <h3>💰 ຍອດເງິນທຸກທີມ</h3><div id="playerAuctionMoneyBoard" class="grid players"></div>
+    <div id="playerAuctionEvent" class="notice auction-event">ການຊື້ແລະການປ່ຽນລາຄາຈະສະແດງຢູ່ບ່ອນນີ້</div>
+    <h3>🛒 ລາຄາໄອເທັມ ແລະ ປຸ່ມຊື້</h3><div id="playerAuctionTabs" class="auction-tabs"></div><div id="playerAuctionItems" class="grid items"></div>
+  </section>
+  <section id="hostGame" class="hidden">
+    <div class="panel"><div class="between"><div><h2>🎛️ ໜ້າຄວບຄຸມຜູ້ຄຸມ</h2><p class="muted">ພາບສະທ້ອນໜ້າຈໍທຸກທີມແບບເວລາຈິງ</p></div><div><span class="timer" id="hostGameTimer">--</span><div id="hostRound" class="pill">ຮອບ 0/10</div></div></div>
+      <div class="actions"><button onclick="hostNextQuestion()">ຄຳຖາມຖັດໄປ</button><button class="cyan" onclick="showQuestionBank()">📚 ຄຳຖາມ JSON</button><button class="secondary" onclick="toggleHostScores()" id="toggleHostScoresBtn">👁️ ແສດງຄະແນນທຸກທີມ</button><button class="secondary" onclick="finishGame()">ຈົບເກມ</button></div><div id="hostScoreBoard" class="host-score-board hidden"></div></div>
+    <div id="hostTeams" class="grid teamboard" style="margin-top:14px"></div>
+    <div class="panel" style="margin-top:14px"><h3>🔔 ແຈ້ງເຕືອນການໃຊ້ຟັງຊັນແບບເວລາຈິງ</h3><p class="muted small">ສະແດງວ່າທີມໃດໃຊ້ຟັງຊັນໃດ ແລະສົ່ງຜົນໄປຫາທີມໃດ</p><div id="hostLiveFeed" class="live-feed"></div></div><div class="panel" style="margin-top:14px"><h3>🧰 ຄວບຄຸມຜົນກະທົບ / ຄຳຖາມ</h3><div id="hostActions" class="actions"></div></div><div id="winnerRevealPanel" class="panel winner-panel hidden"></div>
+  </section>
+  <section id="playerGame" class="hidden">
+    <div class="panel between"><div><h2 id="myTeamTitle">ທີມຂອງຂ້ອຍ</h2><span id="myScore" class="pill">ຄະແນນ 0</span></div><div><span class="timer" id="playerGameTimer">--</span><div id="myRound" class="pill">ຮອບ 0/10</div></div></div>
+    <div id="myGameWallet" class="wallet-panel"></div>
+    <div class="gameLayout" style="margin-top:14px"><div><div id="myQuestion" class="panel"><h2>ກະລຸນາລໍຖ້າຜູ້ຄຸມເລີ່ມຄຳຖາມ</h2></div><div class="panel" style="margin-top:12px"><h3>🔔 ແຈ້ງເຕືອນຟັງຊັນ / ຜົນກະທົບ</h3><div id="playerLiveFeed" class="live-feed"></div></div></div><div class="panel"><h3>🎒 ໄອເທັມຂອງທີມ</h3><div id="myInventory" class="inventory"></div><div id="myItemInfo" class="notice">ໄອເທັມທີ່ທີມມີຈະສະແດງຢູ່ບ່ອນນີ້</div></div></div>
+  </section>
+</div>
+<div id="modalRoot"></div>
+<div id="winnerScreenOverlay" class="winner-screen-overlay hidden" aria-live="polite"></div>
+<div id="overlayRoot"></div>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyA10qLYCA20P-AYII6_mGXTFrcYq-tWgQo",
+  authDomain: "bt-a3adb.firebaseapp.com",
+  projectId: "bt-a3adb",
+  storageBucket: "bt-a3adb.firebasestorage.app",
+  messagingSenderId: "635604177831",
+  appId: "1:635604177831:web:ada281ed5685578eed5c82",
+  measurementId: "G-XERB54MXLS",
+  // IMPORTANT: Copy the exact Realtime Database URL from Firebase Console > Realtime Database.
+  databaseURL: "https://bt-a3adb-default-rtdb.asia-southeast1.firebasedatabase.app"
+};
+let db=null, role=null, roomId=null, playerId=null, state=null, roomRef=null, unsub=null;
+let gameTick=null, localQuestionCache=null, localOverlayTimer=null;
+let incomingPromptTimer=null, incomingPromptKey=null;
+let auctionCategory='all';
+let hostScoresVisible=false;
+const AUCTION_CATEGORIES=[
+ ['all','🛒 ທັງໝົດ'],['question','❓ ຄຳຖາມ'],['time','⏱️ ເວລາ'],
+ ['meme','😂 ມີມ'],['weapon','⚔️ ອາວຸດ'],['armor','🛡️ ເກາະ'],['special','✨ ເຄື່ອງມືພິເສດ']
+];
+function itemCategory(it){
+ if(it.kind==='question')return 'question';
+ if(it.kind==='armor')return 'armor';
+ if(it.id==='meme'||/^meme\d+$/.test(it.id))return 'meme';
+ if(it.kind==='time'||/^time(?:plus|minus)/.test(it.id))return 'time';
+ if(it.kind==='attack')return 'weapon';
+ return 'special';
+}
+function changeAuctionCategory(category){
+ if(!AUCTION_CATEGORIES.some(([id])=>id===category))return;
+ auctionCategory=category;
+ if(state?.phase==='auction')renderAuctionItems(role==='host'?'hostAuctionItems':'playerAuctionItems');
+}
+
+const $=id=>document.getElementById(id);
+const MEMES=[["💪", "สู้ ๆ นะ เป็นกำลังใจให้!"], ["🤔", "ตอบไม่ได้เหรอ?"], ["😅", "ไหวเปล่าเนี่ย?"], ["😂", "คิดนานจังเลย!"], ["😎", "ข้อแค่นี้เอง!"], ["🙈", "อย่าแอบดูคำตอบนะ"], ["🧠", "สมองกำลังโหลด..."], ["🐢", "ช้ากว่าเต่าอีก!"], ["🔥", "เอาใจช่วยนะ!"], ["👀", "ทุกคนรอดูอยู่!"], ["🤣", "ขำก่อนตอบก็ได้"], ["🎯", "มั่นใจคำตอบไหม?"], ["😴", "ตื่นได้แล้ว!"], ["🚀", "เร่งเครื่องหน่อย!"], ["🏆", "เก่งมากถ้าตอบได้!"]];
+const ITEMS=[
+{id:'question',name:'ຄຳຖາມ',icon:'❓',desc:'ຊຸດຄຳຖາມສຳລັບເກມ',kind:'question'},
+{id:'timeplus3',name:'ເພີ່ມເວລາ +3 ວິ',icon:'⏱️',desc:'ເພີ່ມເວລາຕໍ່ຂໍ້ 3 ວິນາທີ',kind:'time',value:3},
+{id:'timeplus5',name:'ເພີ່ມເວລາ +5 ວິ',icon:'⏱️',desc:'ເພີ່ມເວລາຕໍ່ຂໍ້ 5 ວິນາທີ',kind:'time',value:5},
+{id:'timeplus7',name:'ເພີ່ມເວລາ +7 ວິ',icon:'⏱️',desc:'ເພີ່ມເວລາຕໍ່ຂໍ້ 7 ວິນາທີ',kind:'time',value:7},
+{id:'timeplus10',name:'ເພີ່ມເວລາ +10 ວິ',icon:'⏱️',desc:'ເພີ່ມເວລາຕໍ່ຂໍ້ 10 ວິນາທີ',kind:'time',value:10},
+{id:'timeminus3',name:'ຕັດເວລາ −3 ວິ',icon:'🕒',desc:'ໂຈມຕີທີມອື່ນ 3 ຂໍ້',kind:'attack',value:'time-3'},
+{id:'timeminus5',name:'ຕັດເວລາ −5 ວິ',icon:'🕒',desc:'ໂຈມຕີທີມອື່ນ 3 ຂໍ້',kind:'attack',value:'time-5'},
+{id:'timeminus7',name:'ຕັດເວລາ −7 ວິ',icon:'🕒',desc:'ໂຈມຕີທີມອື່ນ 3 ຂໍ້',kind:'attack',value:'time-7'},
+{id:'timeminus10',name:'ຕັດເວລາ −10 ວິ',icon:'🕒',desc:'ໂຈມຕີທີມອື່ນ 3 ຂໍ້',kind:'attack',value:'time-10'},
+{id:'meme1',name:"มีม: สู้ ๆ นะ เป็นกำลังใจให้!",icon:"💪",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme2',name:"มีม: ตอบไม่ได้เหรอ?",icon:"🤔",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme3',name:"มีม: ไหวเปล่าเนี่ย?",icon:"😅",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme4',name:"มีม: คิดนานจังเลย!",icon:"😂",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme5',name:"มีม: ข้อแค่นี้เอง!",icon:"😎",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme6',name:"มีม: อย่าแอบดูคำตอบนะ",icon:"🙈",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme7',name:"มีม: สมองกำลังโหลด...",icon:"🧠",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme8',name:"มีม: ช้ากว่าเต่าอีก!",icon:"🐢",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme9',name:"มีม: เอาใจช่วยนะ!",icon:"🔥",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme10',name:"มีม: ทุกคนรอดูอยู่!",icon:"👀",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme11',name:"มีม: ขำก่อนตอบก็ได้",icon:"🤣",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme12',name:"มีม: มั่นใจคำตอบไหม?",icon:"🎯",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme13',name:"มีม: ตื่นได้แล้ว!",icon:"😴",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme14',name:"มีม: เร่งเครื่องหน่อย!",icon:"🚀",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme15',name:"มีม: เก่งมากถ้าตอบได้!",icon:"🏆",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'reflect',name:'ເກາະສະທ້ອນ',icon:'🪞',desc:'ສະທ້ອນການໂຈມຕີກັບຄືນ',kind:'armor',value:'reflect'},
+{id:'shield',name:'ເກາະປ້ອງກັນ',icon:'🛡️',desc:'ປ້ອງກັນການໂຈມຕີ 1 ຄັ້ງ',kind:'armor',value:'shield'},
+{id:'half',name:'ຕັດຕົວເລືອກ',icon:'✂️',desc:'ເຫຼືອ 2 ຕົວເລືອກ 3 ຄຳຖາມ',kind:'weapon',value:'half'},
+{id:'virus',name:'ສົ່ງໄວຣັສ',icon:'🦠',desc:'ເອັບເຟັກໄວຣັສ 7 ວິນາທີ',kind:'attack',value:'virus'},
+{id:'sandstorm',name:'ພາຍຸທະເລຊາຍ',icon:'🌪️',desc:'ເອັບເຟັກພາຍຸ 7 ວິນາທີ',kind:'attack',value:'sandstorm'},
+{id:'meteor',name:'ອຸກາບາດຖະຫຼົ່ມ',icon:'☄️',desc:'ຈໍບາງສ່ວນດຳ 7 ວິນາທີ',kind:'attack',value:'meteor'},
+{id:'flip',name:'ຈໍກັບຫົວ',icon:'🙃',desc:'ກັບຫົວ 7 ວິນາທີ',kind:'attack',value:'flip'},
+{id:'blink',name:'ຈໍກະພິບ',icon:'💡',desc:'ຈໍກະພິບ 7 ວິນາທີ',kind:'attack',value:'blink'},
+{id:'kill',name:'ສັງຫານໂຫດ',icon:'💀',desc:'ທີມເປົ້າໝາຍແພ້ທັນທີ ຖ້າບໍ່ມີໄອເທັມປ້ອງກັນ',kind:'attack',value:'kill'},
+{id:'boardwipe',name:'ລ້າງກະດານ',icon:'🧹',desc:'ລ້າງຄະແນນ ແລະເລີ່ມຄຳຖາມໃໝ່',kind:'weapon',value:'boardwipe'},
+{id:'cut',name:'ຕັດຊອຍ',icon:'🔪',desc:'ຕັດຄຳຕອບຜິດ 2 ຕົວເລືອກ 1 ຂໍ້',kind:'weapon',value:'cut'},
+{id:'aura',name:'ເພີ່ມບາລະມີ',icon:'✨',desc:'ເພີ່ມຄະແນນຕົນເອງ 1',kind:'weapon',value:'aura'},
+{id:'steal',name:'ລັກສະເບຽງ',icon:'🤑',desc:'ຂະໂມຍ 1 ຄະແນນຈາກແຕ່ລະທີມ',kind:'weapon',value:'steal'},
+{id:'penalty',name:'ຈຸດໂທດ',icon:'⚖️',desc:'ເລີ່ມຮອບຈຸດໂທດ',kind:'weapon',value:'penalty'},
+{id:'heartbox',name:'ບີບກ່ອງດວງໃຈ',icon:'🎁',desc:'ເບິ່ງໄອເທັມສັດຕູ ແລະຂະໂມຍ 1 ອັນ',kind:'attack',value:'heartbox'},
+{id:'poison',name:'ຄຳຖາມພິດ',icon:'☠️',desc:'ສັດຕູຕອບຖືກ −1 ຄະແນນ, ຜິດ −2',kind:'attack',value:'poison'},
+{id:'double',name:'ດັບເບິນດຣາເມດ',icon:'🔋',desc:'ເພີ່ມການໃຊ້ໄອເທັມ 1 ອັນອີກ 1 ຄັ້ງ',kind:'weapon',value:'double'},
+{id:'parallel',name:'ໂລກຄູ່ຂະໜານ',icon:'🪐',desc:'ສະຫຼັບຄະແນນກັບທີມເປົ້າໝາຍ',kind:'attack',value:'parallel'},
+{id:'pick',name:'ຄຳຖາມພິຄາດ',icon:'🎯',desc:'ຕອບຖືກຊະນະ, ຕອບຜິດແພ້',kind:'weapon',value:'pick'},
+{id:'god',name:'ໂກງພະເຈົ້າ',icon:'👑',desc:'ຄະແນນເທົ່າກັບທີມຄະແນນສູງສຸດ',kind:'weapon',value:'god'},
+{id:'zombie',name:'ຊອມບີ້',icon:'🧟',desc:'ເອົາໄອເທັມທີ່ເຄີຍໃຊ້ຄືນ 1 ອັນ',kind:'weapon',value:'zombie'},
+{id:'heaven',name:'ນ້ຳຕາສະຫວັນ',icon:'🌈',desc:'ຕອບຖືກ +2, ຕອບຜິດ +1',kind:'weapon',value:'heaven'},
+{id:'hellheart',name:'ຫົວໃຈນະລົກ',icon:'❤️‍🔥',desc:'ສັດຕູຕອບຖືກ −1, ຜິດ −2',kind:'attack',value:'hellheart'}
+];
+const SAMPLE_QUESTIONS=[
+{ question:"ຄວາມໝາຍຂອງການອະພິປາຍແມ່ນຂໍ້ໃດ?", choices: ["ການຄັດຄ້ານຕໍ່ສິ່ງທີ່ບໍ່ດີ","ການສະແດງບົດບາດສົມມຸດ","ການເວົ້າກ່ຽວກັບສິ່ງທີ່ດີຂອງສິ່ງໃດໜຶ່ງ","ການສະແດງຄວາມຄິດເຫັນ 2 ດ້ານ, ເຫດ ແລະ ຜົນ"], answer:"ການສະແດງຄວາມຄິດເຫັນ 2 ດ້ານ, ເຫດ ແລະ ຜົນ"},
+{ question:"ຂໍ້ໃດບົ່ງບອກເຖິງການຂຽນຈົດໝາຍ?", choices: ["ຂຽນຫາຄົນທີ່ບໍ່ຮູ້ຈັກ","ຂຽນສິ່ງທີ່ເຮົາເວົ້າໃຫ້ຄົນຮູ້","ຂຽນບອກສິ່ງໃດສິ່ງໜຶ່ງໃຫ້ອ່ານ","ຂຽນເພື່ອສົ່ງຂ່າວຜູ້ລຶ້ງເຄີຍ ແລະ ຮັກແພງ"], answer:"ຂຽນເພື່ອສົ່ງຂ່າວຜູ້ລຶ້ງເຄີຍ ແລະ ຮັກແພງ"},
+{ question:"ຂໍ້ໃດແມ່ນສະຫຼະປ່ຽນຮູບເມື່ອປະສົມຕົວສະກົດ ງ?", choices: ["ສ + xະ + ງ ປ່ຽນເປັນ ສ + xະ + ງ = ສະງ","ສ + xະ + ງ ປ່ຽນເປັນ ສ + xັ + ງ = ສັງ","ສ + xະ + ງ ປ່ຽນເປັນ ສ + xະ + ງ = ສງະ","ສ + xະ + ງ ປ່ຽນເປັນ ສ + xົ + ງ = ສົງ"], answer:"ສ + xະ + ງ ປ່ຽນເປັນ ສ + xັ + ງ = ສັງ"},
+{ question:"ໃນບົດພັນລະນາເວົ້າເຖິງກະຕ່າຍຕົວໜຶ່ງ, ບົດນີ້ແມ່ນບົດປະເພດໃດ?", choices: ["ພັນລະນະຄົນ","ພັນລະນາວັດຖຸ","ພັນລະນາສັດ","ພັນລະນາພາບ"], answer:"ພັນລະນາສັດ"},
+{ question:"ປະໂຫຍກໃນຂໍ້ໃດແມ່ນເວົ້າເຖິງກາລະປັດຈຸບັນ?", choices: ["ຂ້ອຍໄປວັດມື້ອື່ນ","ຂ້ອຍໄປຕະຫຼາດມາແລ້ວ","ຂ້ອຍຊິເດີນທາງໄປປາກເຊ","ຂ້ອຍພວມຍ່າງໄປໂຮງຮຽນ"], answer:"ຂ້ອຍພວມຍ່າງໄປໂຮງຮຽນ"},
+{ question:"ກອນວັກນີ້ແມ່ນສໍາຜັດຫຍັງ? “ເຮົາພໍ່າພ້ອມ ປູກໄມ້ໃຫ້ຫຼາຍ”", choices: ["ສໍາຜັດສະຫຼະ","ສໍາຜັດພະຍັນຊະນະ","ສໍາຜັດແມ່ນສະກົດ","ສໍາຜັດວັນນະຍຸດ"], answer:"ສໍາຜັດພະຍັນຊະນະ"},
+{ question:"ຂໍ້ໃດແມ່ນຄຸນລັກສະນະຂອງບົດກອນ?", choices: ["ວັກ, ຕອນ, ເຟື້ອງ, ບາດ, ແຖວ","ວັກ, ຕອນ, ເຟື້ອງ, ບາດ, ຄໍາ","ຄໍາ, ຕອນ, ແຖວ, ບາດ","ບາດ, ເລື່ອງ, ວັກ, ແຖວ"], answer:"ວັກ, ຕອນ, ເຟື້ອງ, ບາດ, ຄໍາ"},
+{ question:"ສູງ ແລະ ຕໍ່າແມ່ນຄໍາປະເພດໃດ?", choices: ["ຄໍານາມ","ຄໍາອຸທານ","ຄໍາກໍາມະ","ຄໍາກົງກັນຂ້າມ"], answer:"ຄໍາກົງກັນຂ້າມ"},
+{ question:"ຂໍ້ໃດແມ່ນຄໍາແທນນາມທັງໝົດ?", choices: ["ຂ້ອຍ, ເຈົ້າ, ພວກເຮົາ","ຂ້ອຍ, ແລ່ນ, ງາມ","ສູ, ເຂົາ, ໄປ","ໂຕ, ເພິ່ນ, ຕະຫຼາດ"], answer:"ຂ້ອຍ, ເຈົ້າ, ພວກເຮົາ"},
+{ question:"ຄໍາທີ່ຕື່ມໃສ່ທາງຫຼັງຂອງວັກໃນບົດກອນເອີ້ນວ່າຄໍາຫຍັງ?", choices: ["ຄໍາບຸບພະບົດ","ຄໍາອຸທານ","ຄໍາເຊື່ອມ","ຄໍາສ້ອຍ"], answer:"ຄໍາສ້ອຍ"},
+{ question:"ຖ້າມີຂໍ້ຄວາມອື່ນໆທີ່ຕ້ອງການຂຽນໃສ່ບ່ອນນີ້ແຕ່ຫາກບໍ່ຂຽນເຮົາໃຊ້ ເຄື່ອງໝາຍຫຍັງແທນ?", choices: ["ສອງຈໍ້າ (:)","ສາມຈໍ້າ (...)","ໝາຍຈຸດ (,)","ໝາຍທ້ວງ (!)"], answer:"ສາມຈໍ້າ (...)"},
+{ question:"ຄໍາສັບໃດທີ່ຂຽນຖືກ?", choices: ["ຂີ້ເຫື້ຍອ","ຂີ້ເຫຍອື້","ຂີ້ເຫຍື້ອ","ຂີ້ເຫື່ອຍ"], answer:"ຂີ້ເຫຍື້ອ"},
+{ question:"ຈົ່ງຈັດລຽງປະໂຫຍກລຸ່ມນີ້ໃຫ້ຖືກຕ້ອງດັ່ງ: ເປັນ / . / ຂ້ອຍ/ ເກັ່ງ/ ນັກຮຽນ/", choices: ["ຂ້ອຍເປັນນັກຮຽນເກັ່ງ.","ນັກຮຽນເກັ່ງເປັນຂ້ອຍ.","ເປັນຂ້ອຍນັກຮຽນເກັ່ງ.","ນັກຮຽນເກັ່ງຂ້ອຍເປັນ."], answer:"ຂ້ອຍເປັນນັກຮຽນເກັ່ງ."},
+{ question:"ມື້ໜຶ່ງແມ່ນຄໍາບອກເຖິງຫຍັງ?", choices: ["ຄໍານາມ","ຄໍາບອກເວລາ","ບອກຕອນເຊົ້າ","ຄໍາບອກໃຫ້ຮູ້"], answer:"ຄໍາບອກເວລາ"},
+{ question:"ຄໍາໃຊ້ແທນຕົນເອງທີ່ເປັນທາງການແມ່ນຄໍາໃດ?", choices: ["ຂ້າພະເຈົ້າ","ຂ້ອຍ","ເຮົາ","ກູ"], answer:"ຂ້າພະເຈົ້າ"},
+{ question:"ສະຫຼະໃດເມື່ອປະກອບກັບຄໍາທີ່ມີຕົວສະກົດຮູບຈະປ່ຽນເປັນຮູບອື່ນ?", choices: ["ສະຫຼະ xາ","ສະຫຼະ xຸ","ສະຫຼະ xີ","ສະຫຼະ ໂxະ"], answer:"ສະຫຼະ ໂxະ"},
+{ question:"ສະຫຼະພິເສດໃນພາສາລາວມີຕົວໃດແດ່?", choices: ["ໄx, ໃx, ເxົາ, ເxີ","ໄx, ໃx, ເxົາ, ແx","ໄx, ເx, ເxົາ, xໍາ","ໄx, ໃx, ເxົາ, xໍາ"], answer:"ໄx, ໃx, ເxົາ, xໍາ"},
+{ question:"ຄໍາທີ່ໃຊ້ແທນຊື່ເອີ້ນຂອງຄົນ, ສັດ ແລະ ວັດຖຸສິ່ງຂອງແມ່ນຄໍາຫຍັງ?", choices: ["ຄໍານາມ","ຄໍາແທນນາມ","ຄໍາຄຸນນາມ","ຄໍາກໍາມະ"], answer:"ຄໍາແທນນາມ"},
+{ question:"ຄໍາທີ່ຕື່ມໃສ່ຂ້າງໜ້າຂອງວັກໃນກາບກອນ ເອີ້ນວ່າຫຍັງ?", choices: ["ຄໍາສ້ອຍ","ຄໍາບຸບພະບົດ","ວັກ","ເຟື້ອງ"], answer:"ຄໍາບຸບພະບົດ"},
+{ question:"ຂໍ້ໃດແມ່ນ ຄໍາກໍາມະ ທັງໝົດ?", choices: ["ໄປ, ຂຽນ, ແມວ, ງາມ","ໄປ, ຂຽນ, ຟ້ອນ, ງາມ","ໄປ, ຂຽນ, ຟ້ອນ, ຍ່າງ","ໄປ, ຂຽນ, ຟ້ອນ, ຂ້ອຍ"], answer:"ໄປ, ຂຽນ, ຟ້ອນ, ຍ່າງ"},
+{ question:"ເຄື່ອງໝາຍທີ່ໃຊ້ໝາຍທ້າຍປະໂຫຍກ ເພື່ອສະແດງວ່າໝົດປະໂຫຍກ ຫຼື ໝົດວັກ ແມ່ນຂໍ້ໃດ?", choices: ["( . )","( , )","( : )","( ? )"], answer:"( . )"},
+{ question:"ສະຫຼະ ເxັຍ ເມື່ອປະກອບກັບຕົວສະກົດຈະປ່ຽນຈາກຮູບເດີມໄປເປັນຮູບໃດ?", choices: ["xັx","xຽx","ເxັ","xັຽ"], answer:"xັຽ"},
+{ question:"ຄໍາວ່າ: ປຶ້ມ, ໄກ່, ແມວ, ກະດານ ແມ່ນຄໍາຫຍັງ?", choices: ["ຄໍານາມ","ຄໍາແທນນາມ","ຄໍາກໍາມະ","ຄໍາຄຸນນາມ"], answer:"ຄໍານາມ"},
+{ question:"ເຄື່ອງໝາຍທ້ວງ (!) ແມ່ນໃຫ້ຂຽນຢູ່ທ້າຍຄໍາຫຍັງ?", choices: ["ຄໍາບອກເວລາ","ຄໍາຕໍ່","ຄໍາອຸທານ","ຄໍາເຊື່ອມ"], answer:"ຄໍາອຸທານ"},
+{ question:"ການຂຽນຂ່າວຕ້ອງຂຽນແນວໃດ?", choices: ["ພາສາທ້ອງຖິນທີ່ຈະແຈ້ງ ແລະ ກະທັດຮັດ","ພາສາທີ່ຈະແຈ້ງ ແລະ ກະທັດຮັດ","ພາສາທີ່ຈະແຈ້ງ ແລະ ທັນສະໄໝ","ພາສາທີ່ເປັນເອກະລັກ ແລະ ກະທັດຮັດ"], answer:"ພາສາທີ່ຈະແຈ້ງ ແລະ ກະທັດຮັດ"},
+{ question:"ໃຫ້ສັງເກດເບິ່ງຂໍ້ຄວາມລຸ່ມນີ້ແມ່ນບົດຫຍັງ? (ນາງ ວັນແກ້ວ ເປັນນັກຮຽນ ປ.5 ລາວມີຄວາມສົນໃຈຕໍ່ອາຊີບການປົກປັກຮັກສາປ່າໄມ້)", choices: ["ບົດສະເໜີ","ບົດລາຍງານ","ບົດອະທິບາຍ","ບົດຊັກຊວນ"], answer:"ບົດລາຍງານ"},
+{ question:"ຂໍ້ໃດແມ່ນການສະແດງເຖິງສະຖານທີ່?", choices: ["ນັກຮຽນເກັ່ງ","ຕົ້ນໄມ້ທີ່ຂຽວງາມ","ໂຮງຮຽນປະຖົມ","ຂອງຂວັນວັນຄູ"], answer:"ໂຮງຮຽນປະຖົມ"},
+{ question:"ຄໍາໃນວົງເລັບລຸ່ມນີ້ ແມ່ນຢູ່ພາກໃດ? ຂອງໂຄງຮ່າງໃບຄໍາຮ້ອງ. (ບ້ານ, ເມືອງ ແລະ ແຂວງ)", choices: ["ພາກຕົ້ນ","ພາກແນະນໍາຕົນເອງ","ພາກເນື້ອໃນ","ພາກສະຫຼຸບ"], answer:"ພາກແນະນໍາຕົນເອງ"},
+{ question:"ໂຄງຮ່າງພັນລະນາມີຈັກພາກສ່ວນ?", choices: ["4 ພາກສ່ວນ","5 ພາກສ່ວນ","6 ພາກສ່ວນ","7 ພາກສ່ວນ"], answer:"4 ພາກສ່ວນ"},
+{ question:"ການກະຈາຍຂ່າວຜ່ານສື່ມວນຊົນມີຫຍັງແດ່?", choices: ["ໜັງສືພິມ, ວິທະຍຸ, ຄົນອື່ນ","ໜັງສືພິມ, ອ້າຍ ນ້ອງ, ໂທລະພາບ","ໝູ່ເພື່ອນ, ວິທະຍຸ, ໂທລະພາບ","ໜັງສືພິມ, ວິທະຍຸ, ໂທລະພາບ"], answer:"ໜັງສືພິມ, ວິທະຍຸ, ໂທລະພາບ"},
+{ question:"ຂໍ້ມູນລາຍງານຂ່າວເຫດການໃດໜຶ່ງຄວນລາຍງານແນວໃດ?", choices: ["ຄວາມຈິງ ແຕ່ກວດສອບບໍ່ໄດ້","ຄວາມຈິງ ແລະ ກວດສອບໄດ້","ບໍ່ມີຄວາມຈິງ ແລະ ກວດສອບໄດ້","ສະຖານທີ່ ແລະ ກວດສອບໄດ້"], answer:"ຄວາມຈິງ ແລະ ກວດສອບໄດ້"},
+{ question:"ຕອນທ້າຍບົດນິທານຄາຖາສາມຫຼອດສອນກ່ຽວກັບຫຍັງ?", choices: ["ຄວາມດື້ດ້ານ","ຄວາມເອົາແຕ່ໃຈ","ຄວາມອົດທົນ","ຄວາມດຸໝັ່ນ, ຄວາມອົດທົນ"], answer:"ຄວາມດຸໝັ່ນ, ຄວາມອົດທົນ"},
+{ question:"ຄໍາບຸບພະບົດແມ່ນຫຍັງ?", choices: ["ຄໍາຕື່ມໃສ່ທາງກາງຂອງກາບກອນ","ຄໍາຕື່ມໃສ່ຂ້າງໜ້າຂອງກາບກອນ","ຄໍາຕື່ມໃສ່ຂ້າງຫຼັງຂອງກາບກອນ","ຄໍາຕື່ມໃສ່ຕອນຕົ້ນຂອງກາບກອນ"], answer:"ຄໍາຕື່ມໃສ່ຂ້າງໜ້າຂອງກາບກອນ"},
+{ question:"ບົດທີ່ມີ ຫົວຂໍ້, ແຜນວາດ, ຮູບປະກອບ ແລະ ຄໍາສະຫຼຸບກ່ຽວກັບຫົວຂໍ້ ແມ່ນບົດຫຍັງ?", choices: ["ບົດໂຄສະນາ","ບົດອະທິບາຍ","ບົດກອນ","ບົດລາຍງານ"], answer:"ບົດລາຍງານ"},
+{ question:"ປະໂຫຍກໃດແມ່ນການຊັກຊວນ?", choices: ["ເຈົ້າໄປໂຮງຮຽນນໍາຂ້ອຍບໍ","ເຈົ້າຕ້ອງໄປໂຮງຮຽນ","ຂ້ອຍໄປໂຮງຮຽນນໍາອ້າຍ","ຂ້ອຍໄປໂຮງຮຽນນໍາໝູ່"], answer:"ເຈົ້າໄປໂຮງຮຽນນໍາຂ້ອຍບໍ"},
+{ question:"ໂຄງຮ່າງຂອງໃບຄໍາຮ້ອງມີພາກສ່ວນໃດແດ່?", choices: ["ພາກຕົ້ນ, ແນະນໍາຕົນເອງ, ສະຫຼຸບ","ພາກຕົ້ນ, ແນະນໍາຕົນເອງ, ເນື້ອໃນ, ສະຫຼຸບ","ພາກຕົ້ນ, ເນື້ອໃນ, ສະຫຼຸບ","ພາກຕົ້ນ, ແນະນໍາຕົນເອງ, ເນື້ອໃນ"], answer:"ພາກຕົ້ນ, ແນະນໍາຕົນເອງ, ເນື້ອໃນ, ສະຫຼຸບ"},
+{ question:"ປະໂຫຍກໃນວົງເລັບລຸ່ມນີ້ ແມ່ນຢູ່ຂັ້ນຕອນໃດ? ຂອງໂຄງຮ່າງບົດພັນລະນາຄົນ (ການປະຕິບັດທີ່ສະແດງອອກໃນດ້ານການຮຽນ)", choices: ["ຫົວຂໍ້","ເປີດຫົວເລື່ອງ","ເນື້ອເລື່ອງ","ສະຫຼຸບເລື່ອງ"], answer:"ເນື້ອເລື່ອງ"},
+{ question:"ພາກສ່ວນຂອງກາບກອນມີຫຍັງແດ່?", choices: ["ຄໍາ, ຕອນ, ວັກ, ເຟື້ອງ, ຂ້າງໜ້າ","ຄໍາ, ຕອນ, ວັກ, ເຟື້ອງ, ບາດ","ຄໍາ, ຕອນ, ວັກ, ບາດ, ຂ້າງຫຼັງ","ຄໍາ, ຕອນ, ເຟື້ອງ, ບາດ, ຕອນໜ້າ"], answer:"ຄໍາ, ຕອນ, ເຟື້ອງ, ບາດ, ຕອນໜ້າ"},
+{ question:"ພາກສ່ວນຂອງປະໂຫຍກປະກອບມີຫຍັງແດ່?", choices: ["ຄໍາຕົວຕັ້ງ, ຄໍາກໍາມະ ແລະ ຄໍາປະກອບ","ຄໍາຕົວຕັ້ງ, ຄໍານາມ ແລະ ຄໍາປະກອບ","ຄໍາຕົວຕັ້ງ, ຄໍາຄຸນນາມ ແລະ ຄໍາປະກອບ","ຄໍາຕົວຕັ້ງ, ຄໍາອຸທານ ແລະ ຄໍາປະກອບ"], answer:"ຄໍາຕົວຕັ້ງ, ຄໍາກໍາມະ ແລະ ຄໍາປະກອບ"},
+{ question:"ເຄື່ອງໝາຍທີ່ເພິ່ນໃຊ້ເພື່ອໃຫ້ນັກຮຽນອ່ານ, ຕ້ອງຢຸດເຊົາໜ້ອຍໜຶ່ງມີເຄື່ອງໝາຍແນວໃດ?", choices: ["ຈໍ້າເມັດ ແລະ ສອງຈໍ້າ","ຈຸດ ແລະ ຈໍ້າຈຸດ","ຈໍ້າເມັດ ແລະ ສາມຈໍ້າ","ຈຸດ ແລະ ສອງຈໍ້າ"], answer:"ຈຸດ ແລະ ຈໍ້າຈຸດ"},
+];
+function initFirebase(){try{if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);db=firebase.database();db.ref('.info/connected').on('value',s=>{$('connection').textContent=s.val()?'🟢 ເຊື່ອມຕໍ່ Firebase':'🟠 ກຳລັງເຊື່ອມຕໍ່…'});}catch(e){$('connection').textContent='🔴 Firebase ມີບັນຫາ: '+e.message}}
+initFirebase();
+function showOnly(id){['home','hostLobby','playerJoin','hostAuction','playerAuction','hostGame','playerGame'].forEach(x=>$(x).classList.toggle('hidden',x!==id))}
+function chooseRole(r){role=r;if(!db){alert('Firebase ຍັງບໍ່ພ້ອມ. ກວດ databaseURL ແລະ Firebase Rules.');return}if(r==='host')createRoom();else showOnly('playerJoin')}
+function backHome(){clearInterval(gameTick);if(roomRef&&unsub)roomRef.off('value',unsub);role=null;roomId=null;playerId=null;state=null;showOnly('home')}
+function createRoom(){roomId=String(Math.floor(1000+Math.random()*9000));playerId='host';roomRef=db.ref('showRooms/'+roomId);roomRef.set({hostId:'host',phase:'lobby',players:{},teams:{},game:{round:0,question:null,endsAt:0,answered:{},effects:{},usedItems:[]},questions:SAMPLE_QUESTIONS,createdAt:Date.now()}).then(()=>{ $('roomCode').textContent=roomId;showOnly('hostLobby');listenRoom();}).catch(e=>alert('ສ້າງຫ້ອງບໍ່ສຳເລັດ: '+e.message))}
+function listenRoom(){if(!roomRef)return;unsub=s=>{state=s.val();if(!state)return;renderAll()};roomRef.on('value',unsub)}
+function joinRoom(){const code=$('joinCode').value.trim(),name=$('playerName').value.trim();if(!/^\d{4}$/.test(code)||!name){$('joinError').textContent='ກະລຸນາໃສ່ລະຫັດ 4 ຕົວ ແລະຊື່';return}roomId=code;roomRef=db.ref('showRooms/'+roomId);roomRef.once('value').then(s=>{const v=s.val();if(!v){$('joinError').textContent='ບໍ່ພົບຫ້ອງນີ້';return}const players=v.players||{};if(Object.keys(players).length>=4){$('joinError').textContent='ຫ້ອງເຕັມ 4 ທີມແລ້ວ';return}if(v.phase!=='lobby'){$('joinError').textContent='ເກມເລີ່ມແລ້ວ';return}playerId='p'+Math.random().toString(36).slice(2,8);const idx=Object.keys(players).length+1;roomRef.child('players/'+playerId).set({id:playerId,name,team:idx,joinedAt:Date.now()}).then(()=>{role='player';listenRoom();showOnly('playerJoin');});}).catch(e=>$('joinError').textContent=e.message)}
+function playersList(){return Object.entries(state?.players||{}).sort((a,b)=>a[1].team-b[1].team)}
+function teamById(id){return state?.players?.[id]}
+function renderLobby(){const ps=playersList();$('lobbyPlayers').innerHTML=[1,2,3,4].map(n=>{const p=ps.find(x=>x[1].team===n);return `<div class="player"><b>ທີມ ${n}</b><p>${p?esc(p[1].name):'<span class="muted">ລໍຖ້າຜູ້ຫຼິ້ນ…</span>'}</p><span class="pill">${p?'ເຂົ້າແລ້ວ':'ວ່າງ'}</span></div>`}).join('');$('startGame').disabled=ps.length!==4}
+function initTeams(){const teams={};playersList().forEach(([id,p])=>teams[id]={id,name:p.name,team:p.team,score:0,money:100,inventory:[],questions:[],answered:0,alive:true,extraTime:0,halfLeft:0,poison:0,hellheart:0,heaven:0,penalty:false});return teams;}
+function initialAuction(){return {active:true,startedAt:Date.now(),endsAt:Date.now()+180000,prices:Object.fromEntries(ITEMS.map(it=>[it.id,0])),bids:{},purchaseCount:0,lastPurchase:null,settled:false};}
+function goToAuction(){
+ if(role!=='host'||playersList().length!==4)return;
+ const teams=initTeams();
+ roomRef.update({phase:'auction',teams,auction:initialAuction()}).catch(e=>alert('ເປີດປະມູນບໍ່ສຳເລັດ: '+e.message));
+}
+function backToLobby(){if(role==='host'&&state?.phase==='auction')roomRef.update({phase:'lobby',auction:{active:false,endedAt:Date.now(),prices:state.auction?.prices||{}}});}
+function renderMoneyWallet(targetId,team,label){
+ const target=$(targetId);if(!target||!team)return;
+ const balance=Math.max(0,Number(team.money??100));const pct=Math.max(0,Math.min(100,balance));
+ target.innerHTML=`<div class="wallet-line"><b>💰 ${esc(label||('ທີມ '+team.team+' • '+team.name))}</b><strong class="wallet-value">${balance} / 100 ເຫຼຽນ</strong></div><div class="money-track"><div class="money-fill ${pct<=20?'low':''}" style="width:${pct}%"></div></div>`;
+}
+function renderAuctionItems(targetId){
+ const target=$(targetId);if(!target)return;const playerView=targetId==='playerAuctionItems';
+ const tab=$(playerView?'playerAuctionTabs':'hostAuctionTabs');if(tab)tab.innerHTML=AUCTION_CATEGORIES.map(([id,label])=>`<button class="${auctionCategory===id?'selected':''}" onclick="changeAuctionCategory('${id}')">${label}</button>`).join('');
+ const auction=state?.auction||{};const team=state?.teams?.[playerId];
+ const balance=Math.max(0,Number(team?.money??100));
+ const questions=state?.questions?.length?state.questions:SAMPLE_QUESTIONS;
+ const catalog=[...ITEMS.filter(x=>x.id!=='question'),...questions.map((q,i)=>({id:'question_'+i,name:'ຄຳຖາມ '+(i+1),icon:'❓',desc:q.question,kind:'question',questionData:q}))];
+ const bids=auction.bids||{};
+ target.innerHTML=catalog.filter(it=>auctionCategory==='all'||itemCategory(it)===auctionCategory).map(it=>{
+  const bid=bids[it.id]||{};const currentPrice=Math.max(0,Number(bid.price??auction.prices?.[it.id]??0));const nextPrice=currentPrice+1;
+  const bidCost=bid.bidderId===playerId?1:nextPrice;
+  const active=!!auction.active&&Number(auction.endsAt||0)>Date.now()&&state?.phase==='auction';
+  const canBid=playerView&&role==='player'&&active&&balance>=bidCost;
+  const leader=bid.bidderId?(state.players?.[bid.bidderId]||state.teams?.[bid.bidderId]):null;
+  const leaderLabel=bid.bidderId?`ผู้นำประมูล: ทีม ${leader?.team??bid.team??'?'} ${esc(leader?.name||bid.playerName||'')}`:'ยังไม่มีผู้ประมูล';
+  const btn=playerView?`<button class="buy-item" ${canBid?'':'disabled'} onclick="buyAuctionItem('${it.id}')">${!active?'⛔ ປິດປະມູນ':balance<bidCost?'💸 ເຫຼຽນບໍ່ພໍ':`🔨 ປະມູນ ${nextPrice} 🪙 (ເສຍ ${bidCost})`}</button>`:'';
+  const preview=it.questionData?`<div class="qtext">${esc(it.questionData.question)}</div><div class="choices">${(it.questionData.choices||[]).map((c,i)=>`<div class="choice">${'ABCD'[i]||i+1}. ${esc(c)}</div>`).join('')}</div>`:`<p class="muted">${esc(it.desc||'')}</p>`;
+  return `<div class="item ${it.questionData?'question-auction':''}"><div style="font-size:30px">${it.icon}</div><h3>${esc(it.name)}</h3>${preview}<div class="price-line"><span>ราคาประมูลสูงสุด</span><strong class="price-number">${currentPrice} 🪙</strong></div><p class="small muted">${leaderLabel}</p><p class="small muted">เสนอครั้งต่อไป: ${nextPrice} เหรียญ • กดครั้งนี้เสีย ${bidCost} เหรียญ • เงินที่จ่ายแล้วไม่คืน • ของชิ้นนี้มีเพียง 1 ชิ้น</p>${btn}</div>`;
+ }).join('');if(window.MathJax&&typeof MathJax.typesetPromise==='function')MathJax.typesetPromise([target]).catch(()=>{});
+}
+
+function renderAuctionDashboard(view){
+ const auction=state?.auction||{};const endAt=Number(auction.endsAt||0);const left=Math.max(0,Math.ceil((endAt-Date.now())/1000));
+ const active=!!auction.active&&endAt>Date.now()&&state?.phase==='auction';
+ const timerId=view==='host'?'hostAuctionTimer':'playerAuctionTimer';const statusId=view==='host'?'hostAuctionStatus':'playerAuctionStatus';
+ if($(timerId))$(timerId).textContent=String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0');
+ if($(statusId))$(statusId).textContent=active?'🟢 ກຳລັງປະມູນ':'🔒 ປິດການຊື້';
+ const board=$(view==='host'?'hostAuctionMoneyBoard':'playerAuctionMoneyBoard');
+ if(board)board.innerHTML=playersList().map(([id,p])=>{const t=state.teams?.[id]||{money:100,team:p.team,name:p.name};const balance=Math.max(0,Number(t.money??100));const pct=Math.min(100,balance);return `<div class="wallet-card"><div class="wallet-line"><b>ທີມ ${p.team}: ${esc(p.name)}</b><strong>${balance} 🪙</strong></div><div class="money-track"><div class="money-fill ${pct<=20?'low':''}" style="width:${pct}%"></div></div></div>`}).join('');
+ const event=auction.lastPurchase;
+ const item=event?ITEMS.find(it=>it.id===event.itemId):null;
+ const eventText=event?`🔨 ທີມ ${event.team}: ${esc(event.playerName||'')} ປະມູນ ${esc(item?.name||(String(event.itemId).startsWith('question_')?'ຄຳຖາມ '+(Number(String(event.itemId).slice(9))+1):event.itemId))} ສູງສຸດ ${Number(event.price)||0} ເຫຼຽນ`:'ລາຄາປະມູນສູງສຸດຈະສະແດງຢູ່ບ່ອນນີ້';
+ const eventBox=$(view==='host'?'hostAuctionEvent':'playerAuctionEvent');if(eventBox)eventBox.innerHTML=eventText;
+ if(view==='player')renderMoneyWallet('playerAuctionWallet',state.teams?.[playerId],'💰 ເງິນຂອງທ່ານ');
+}
+let auctionClosePending=false;
+function settleAuctionAndClose(reason='time'){
+ if(!roomRef||!state||state.phase!=='auction'||auctionClosePending)return;
+ auctionClosePending=true;
+ roomRef.transaction(current=>{
+  if(!current||current.phase!=='auction')return;
+  const auction=current.auction||{};
+  if(auction.settled)return;
+  if(reason==='time'&&(!auction.active||Number(auction.endsAt||0)>Date.now()))return;
+  auction.active=false;auction.endedAt=Date.now();auction.endReason=reason;auction.settled=true;
+  const bids=auction.bids||{};let awardCount=0;
+  Object.entries(bids).forEach(([itemId,bid])=>{
+   if(!bid?.bidderId||!Number(bid.price))return;
+   const team=current.teams?.[bid.bidderId];if(!team)return;
+   const price=Math.max(0,Number(bid.price)||0);
+   if(itemId.startsWith('question_')){
+    const qi=Number(itemId.slice(9));const questions=current.questions?.length?current.questions:SAMPLE_QUESTIONS;const q=questions[qi];
+    if(q){team.questions=Array.isArray(team.questions)?team.questions:[];if(!team.questions.some(old=>old.question===q.question))team.questions.push(JSON.parse(JSON.stringify(q)));}
+   }else{
+    team.inventory=Array.isArray(team.inventory)?team.inventory:[];
+    if(!team.inventory.some(old=>old.id===itemId))team.inventory.push({id:itemId,charges:1});
+   }
+   const player=current.players?.[bid.bidderId]||{};bid.won=true;bid.team=Number(player.team||team.team)||0;bid.playerName=String(player.name||team.name||'');bid.balance=team.money;awardCount++;
+  });
+  auction.awardedCount=awardCount;auction.lastPurchase={...(auction.lastPurchase||{}),status:'settled',at:Date.now(),awardedCount:awardCount};current.auction=auction;return current;
+ },(error,committed,snapshot)=>{auctionClosePending=false;if(error){console.warn('Could not settle auction:',error.message);return;}if(reason==='game-started'&&committed){state=snapshot.val();beginGame();}});
+}
+function maybeCloseAuction(){
+ if(!roomRef||!state||state.phase!=='auction'||!state.auction?.active||Number(state.auction.endsAt||0)>Date.now())return;
+ settleAuctionAndClose('time');
+}
+function buyAuctionItem(itemId){
+ if(role!=='player'||!roomRef||!state||state.phase!=='auction')return;
+ if(!ITEMS.some(it=>it.id===itemId)&&!/^question_\d+$/.test(itemId))return;
+ if(!state.auction?.active||Number(state.auction.endsAt||0)<=Date.now()){showAuctionMessage('ປິດປະມູນແລ້ວ');maybeCloseAuction();return;}
+ roomRef.transaction(current=>{
+  if(!current||current.phase!=='auction'||!current.auction?.active||Number(current.auction.endsAt||0)<=Date.now())return;
+  const team=current.teams?.[playerId];if(!team||!team.alive)return;
+  const auction=current.auction;auction.prices=auction.prices||{};auction.bids=auction.bids||{};
+  const previous=auction.bids[itemId]||{};const price=Math.max(0,Number(previous.price??auction.prices[itemId]??0))+1;
+  const balance=Math.max(0,Number(team.money??100));const cost=previous.bidderId===playerId?1:price;if(balance<cost)return;
+  team.money=balance-cost;
+  const player=current.players?.[playerId]||{};
+  auction.bids[itemId]={itemId,price,bidderId:playerId,team:Number(player.team||team.team)||0,playerName:String(player.name||team.name||''),at:Date.now()};
+  auction.prices[itemId]=price;auction.purchaseCount=(Number(auction.purchaseCount)||0)+1;
+  auction.lastPurchase={team:Number(player.team||team.team)||0,playerName:String(player.name||team.name||''),itemId,price,at:Date.now(),count:auction.purchaseCount,status:'bidding'};
+  current.auction=auction;return current;
+ },(error,committed,snapshot)=>{
+  if(error){showAuctionMessage('ປະມູນບໍ່ສຳເລັດ: '+error.message);return;}
+  if(!committed){showAuctionMessage('ປະມູນບໍ່ໄດ້: ເຫຼຽນບໍ່ພໍ ຫຼື ໝົດເວລາ');return;}
+  const latest=snapshot.val()?.auction?.lastPurchase;
+  if(latest)showAuctionMessage(`🔨 ປະມູນສຳເລັດ • ຈ่ายเงินทันที ${latest.bidderId===playerId?'แล้ว':''} • ລາຄາສູງສຸດ ${latest.price} ເຫຼຽນ • ເງິນທີ່ຈ່າຍແລ້ວບໍ່ຄືນ`);
+ });
+}
+function showAuctionMessage(message){const el=$('playerAuctionEvent');if(el)el.textContent=message;}
+function startGame(){goToAuction()}
+function beginGame(){
+ if(role!=='host'||state?.phase!=='auction'||playersList().length!==4)return;
+ if(!state.auction?.settled){settleAuctionAndClose('game-started');return;}
+ const teams=JSON.parse(JSON.stringify(state.teams||initTeams()));
+ Object.values(teams).forEach(t=>{if(!Array.isArray(t.inventory))t.inventory=[];if(!Number.isFinite(Number(t.money)))t.money=100;});
+ const questions=state?.questions?.length?state.questions:SAMPLE_QUESTIONS;
+ Object.values(teams).forEach(t=>{
+   t.questions=Array.isArray(t.questions)?t.questions:[];
+   for(let i=t.questions.length;i<15;i++){
+     const remaining=questions.filter(q=>!t.questions.some(old=>old.question===q.question));
+     const pool=remaining.length?remaining:questions;const q=pool[Math.floor(Math.random()*pool.length)];
+     t.questions.push(JSON.parse(JSON.stringify(q)));
+   }
+ });
+ roomRef.update({teams,phase:'countdown','auction/active':false,'auction/endedAt':Date.now(),'auction/endReason':'game-started','game/round':0,'game/question':null,'game/answered':{},'game/endsAt':Date.now()+3000,'game/countdown':3,'game/effects':{},'game/usedItems':[]})
+ .then(()=>setTimeout(()=>{if(state?.phase==='countdown')hostNextQuestion()},3000));
+}
+function hostNextQuestion(){if(role!=='host'||!state||state.phase==='game'||state.phase==='finished')return;const round=(state.game?.round||0)+1;if(round>15){finishGame();return}const teams=JSON.parse(JSON.stringify(state.teams||{}));const qByTeam={},deadlines={},now=Date.now();Object.entries(teams).forEach(([id,t])=>{qByTeam[id]=t.questions?.[round-1]||SAMPLE_QUESTIONS[Math.floor(Math.random()*SAMPLE_QUESTIONS.length)];const penalty=t.timePenalty?.remaining>0?Number(t.timePenalty.seconds)||0:0;deadlines[id]=now+Math.max(1,15+(Number(t.extraTime)||0)-penalty)*1000;if(penalty){t.timePenalty.remaining--;if(!t.timePenalty.remaining)delete t.timePenalty;}});roomRef.update({teams,phase:'game','game/round':round,'game/questionByTeam':qByTeam,'game/deadlines':deadlines,'game/answered':{},'game/endsAt':Math.max(...Object.values(deadlines)),'game/effects':state.game?.effects||{}})}
+function advanceTeamQuestion(id,choice,expired=false){
+ if(!roomRef)return;
+ roomRef.transaction(room=>{
+  if(!room||room.phase!=='game'||!room.teams?.[id])return;
+  const t=room.teams[id],g=room.game||{},progress=Number(t.answered||0),deadline=Number(g.deadlines?.[id]||0);
+  if(!t.alive||progress>=15||!g.questionByTeam?.[id]||g.answered?.[id]?.index===progress)return;
+  const now=Date.now();if(expired&&now<deadline)return;if(!expired&&now>=deadline)return;
+  const q=g.questionByTeam[id],correct=!expired&&choice===q.answer;let score=Number(t.score||0);
+  const fx=g.effects?.[id]||{};
+  if(fx.pick){if(correct)fx.won=true;else t.alive=false;delete fx.pick}
+  else if(fx.poison){score+=correct?-1:-2;delete fx.poison}
+  else if(t.heaven>0){score+=correct?2:1;t.heaven--}
+  else if(t.hellheart>0){score+=correct?-1:-2;t.hellheart--}
+  else if(correct)score++;else if(g.penaltyMode)t.alive=false;
+  t.score=score;t.answered=progress+1;
+  g.answered=g.answered||{};g.answered[id]={index:progress,choice:expired?'⌛ ໝົດເວລາ':choice,correct,at:now};
+  if(t.answered>=15||!t.alive){delete g.questionByTeam[id];delete g.deadlines[id];}
+  else {g.questionByTeam[id]=t.questions?.[t.answered]||room.questions?.[t.answered%Math.max(1,room.questions?.length||1)]||q;
+   const penalty=t.timePenalty?.remaining>0?Number(t.timePenalty.seconds)||0:0;
+   g.deadlines[id]=now+Math.max(1,15+Number(t.extraTime||0)-penalty)*1000;
+   if(t.timePenalty?.remaining>0){t.timePenalty.remaining--;if(!t.timePenalty.remaining)delete t.timePenalty;}
+  }
+  g.effects=g.effects||{};g.effects[id]=fx;
+  if(Object.values(room.teams).every(x=>!x.alive||Number(x.answered||0)>=15)){room.phase='finished';g.finishedAt=now;}
+  return room;
+ },(err)=>{if(err)console.warn('Question update failed:',err)});
+}
+function answerQuestion(choice){if(role==='player')advanceTeamQuestion(playerId,choice,false)}
+function renderPlayerQuestion(){const team=state.teams?.[playerId];if(!team)return;renderMoneyWallet('myGameWallet',team,'💰 ເງິນທີມ');$('myTeamTitle').textContent=`🎮 ທີມ ${team.team}: ${team.name}`;$('myScore').textContent=`ຄະແນນ ${team.score}`;$('myRound').textContent=`ຮອບ ${Math.min(15,Number(team.answered||0)+1)}/15`;const q=state.game?.questionByTeam?.[playerId];const lastAnswer=state.game?.answered?.[playerId];const answered=lastAnswer&&Number(lastAnswer.index)===Number(team.answered||0)?lastAnswer:null;const effect=state.game?.effects?.[playerId]||{};const notice=effect.notice;const noticeHTML=notice?`<div class="notice" style="border:2px solid ${notice.lost?'var(--red)':'var(--gold)'};background:${notice.lost?'#511c32':'#302a4f'}"><div style="font-size:clamp(20px,4vw,32px);font-weight:900">${esc(notice.title||'')}</div><p>${esc(notice.detail||'')}</p>${notice.lost?'<div class="big dangertext">❌ ທ່ານແພ້ແລ້ວ</div>':''}</div>`:'';if(!team.alive){const by=effect.eliminatedBy;const killer=by?`<div class="notice" style="border:2px solid var(--red);background:#511c32"><div class="big">💀 ທ່ານຖືກສັງຫານໂຫດ!</div><h2>❌ ທ່ານແພ້ແລ້ວ</h2><p>ຟັງຊັນ: ${esc(ITEMS.find(x=>x.id===by.itemId)?.name||by.itemName||by.itemId||'ບໍ່ຮູ້')}</p><p>ທີມທີ່ສົ່ງມາ: ${esc(by.fromName||'ບໍ່ຮູ້')}</p></div>`:noticeHTML;$('myQuestion').innerHTML=killer;return}if(state.phase==='countdown'){$('myQuestion').innerHTML='<div class="qtext">ເຕັມພ້ອມ… ເກມຈະເລີ່ມໃນໄວໆນີ້!</div>';return}if(!q){$('myQuestion').innerHTML=team.answered>=15?'<h2>✅ ຕອບຄົບ 15 ຂໍ້ແລ້ວ</h2><p>⏳ ລໍຖ້າທີມອື່ນຕອບໃຫ້ຄົບ</p>':'<h2>ລໍຖ້າຄຳຖາມຈາກຜູ້ຄຸມ…</h2>';return}let choices=q.choices||[];const halfKey='halfChoices_'+(team.answered||0);const stored=effect[halfKey];if(stored&&Array.isArray(stored))choices=stored;else if(team.halfLeft>0&&choices.length>2){const wrong=choices.filter(c=>c!==q.answer);choices=[q.answer,...wrong.sort(()=>Math.random()-.5).slice(0,1)];roomRef.child('game/effects/'+playerId+'/'+halfKey).set(choices);roomRef.child('teams/'+playerId+'/halfLeft').set(Math.max(0,team.halfLeft-1));}const disabled=!!answered||!team.alive||Date.now()>=Number(state.game?.deadlines?.[playerId]||0);$('myQuestion').innerHTML=`${noticeHTML}<div class="between"><span class="pill">ຄຳຖາມ ${Math.min(15,(team.answered||0)+1)}/15</span><span class="pill">${answered?(answered.correct?'ຕອບຖືກ':'ຕອບຜິດ'):'ເລືອກຄຳຕອບ'}</span></div><div class="qtext">${q.question}</div><div class="choices">${choices.map((c,i)=>`<button class="choice" ${disabled?'disabled':''} onclick="answerQuestion(${JSON.stringify(c).replace(/"/g,'&quot;')})">${String.fromCharCode(65+i)}. ${c}</button>`).join('')}</div>${answered?`<div class="notice">${answered.correct?'✅ ຖືກຕ້ອງ!':'❌ ຜິດ!'} ${!team.alive?'<b class="dangertext">ທີມທ່ານແພ້ແລ້ວ</b>':''}</div>`:''}`;if(window.MathJax)MathJax.typesetPromise([$ ('myQuestion')]).catch(()=>{})}
+function renderInventory(){const team=state.teams?.[playerId];if(!team)return;const completed=Number(team.answered||0)>=15;const blocked=completed||!team.alive||state.phase!=='game';const items=(team.inventory||[]).map((it,i)=>{const meta=ITEMS.find(x=>x.id===it.id)||{name:it.id,icon:'🎁',desc:''};return `<button class="secondary" ${blocked?'disabled':''} title="${completed?'ຕອບຄົບ 15 ຂໍ້ແລ້ວ ບໍ່ສາມາດໃຊ້ໄອເທັມໄດ້':!team.alive?'ທີມຖືກຄັດອອກ':state.phase!=='game'?'ຍັງບໍ່ແມ່ນເວລາໃຊ້ໄອເທັມ':''}" onclick="useItem(${i})">${meta.icon} ${meta.name} <span class="pill">x${it.charges||1}</span></button>`}).join('');$('myInventory').innerHTML=(completed?'<div class="notice" style="border-color:var(--gold)">🔒 ທ່ານຕອບຄົບ 15 ຂໍ້ແລ້ວ — ລະບົບລັອກການໃຊ້ໄອເທັມທັງໝົດ</div>':'')+(items||'<span class="muted">ຍັງບໍ່ມີໄອເທັມ</span>')}
+// Shared button-based modal for targeting teams and selecting inventory items.
+function closeModal(){const root=$('modalRoot');if(root)root.innerHTML='';}
+function showChoiceModal(title,options,onSelect){
+ const root=$('modalRoot');if(!root)return;
+ root.innerHTML='';
+ const overlay=document.createElement('div');overlay.className='overlay';
+ overlay.style.zIndex='3000';
+ const panel=document.createElement('div');panel.className='panel';
+ panel.style.cssText='width:min(540px,100%);max-height:85vh;overflow:auto;text-align:center';
+ const heading=document.createElement('h2');heading.textContent=title;panel.appendChild(heading);
+ const hint=document.createElement('p');hint.className='muted';hint.textContent='ກົດປຸ່ມເພື່ອເລືອກ • เลือกด้วยปุ่มด้านล่าง';panel.appendChild(hint);
+ const buttons=document.createElement('div');buttons.className='grid';buttons.style.cssText='grid-template-columns:1fr;gap:12px;margin:16px 0';
+ (options||[]).forEach(opt=>{const b=document.createElement('button');b.className='cyan';b.style.cssText='min-height:58px;font-size:19px';b.textContent=opt.label;b.addEventListener('click',()=>{closeModal();onSelect(opt.value)});buttons.appendChild(b)});
+ if(!options?.length){const p=document.createElement('p');p.textContent='ບໍ່ມີຕົວເລືອກ';buttons.appendChild(p)}
+ panel.appendChild(buttons);
+ const cancel=document.createElement('button');cancel.className='secondary';cancel.textContent='✕ ຍົກເລີກ / ยกเลิก';cancel.addEventListener('click',closeModal);panel.appendChild(cancel);
+ overlay.addEventListener('click',e=>{if(e.target===overlay)closeModal()});overlay.appendChild(panel);root.appendChild(overlay);
+}
+function useItem(index){const team=state.teams?.[playerId];if(!team)return;if(Number(team.answered||0)>=15){closeModal();renderInventory();alert('🔒 ທ່ານຕອບຄົບ 15 ຂໍ້ແລ້ວ ບໍ່ສາມາດໃຊ້ໄອເທັມໄດ້');return}if(!team.alive||state.phase!=='game')return;if(!team.inventory?.[index])return;const inv=team.inventory[index],meta=ITEMS.find(x=>x.id===inv.id);if(!meta)return;roomRef.child('game/effects/'+playerId+'/notice').set({id:Date.now(),title:`✨ ກຳລັງໃຊ້ຟັງຊັນ: ${meta.name}`,detail:`ທີມ ${team.team}: ${team.name} ກຳລັງໃຊ້ ${meta.name}`,itemId:inv.id,from:playerId,at:Date.now(),lost:false});pushGameNotice({from:playerId,itemId:inv.id,itemName:meta.name,status:'✨ ກຳລັງໃຊ້',kind:'function',message:`ທີມ ${team.team}: ${team.name} ເລີ່ມໃຊ້ຟັງຊັນ ${meta.name}`});if(meta.kind==='armor'){alert('🛡️ เกราะจะป้องกันอัตโนมัติเมื่อถูกโจมตี');return}let target=null;if(meta.kind==='attack'||['parallel','heartbox','poison','hellheart','timeminus3','timeminus5','timeminus7','timeminus10','kill','meme','virus','sandstorm','meteor','flip','blink'].includes(inv.id)){const opts=Object.entries(state.teams).filter(([id,t])=>id!==playerId&&t.alive).map(([id,t])=>({id,name:`ທີມ ${t.team}: ${t.name}`}));if(!opts.length){alert('ບໍ່ມີທີມເປົ້າໝາຍ');return}showChoiceModal('🎯 ເລືອກທີມເປົ້າໝາຍ',opts.map(o=>({label:o.name,value:o.id})),id=>useItemTarget(index,id));return}
+if(inv.id.startsWith('timeplus')){
+ const seconds=Number(inv.id.replace('timeplus',''))||3;
+ roomRef.update({['teams/'+playerId+'/extraTime']:(team.extraTime||0)+seconds,...(state.phase==='game'&&state.game?.deadlines?.[playerId]?{['game/deadlines/'+playerId]:state.game.deadlines[playerId]+seconds*1000}:{})}).then(()=>consumeItem(index));return;
+ }
+ if(inv.id==='penalty'){roomRef.child('game/penaltyMode').set(true).then(()=>consumeItem(index));return}if(inv.id==='aura'){updateScore(playerId,1);consumeItem(index);return}if(inv.id==='steal'){const updates={};let stolen=0;Object.entries(state.teams).forEach(([id,t])=>{if(id!==playerId&&t.score>0){updates['teams/'+id+'/score']=t.score-1;stolen++;pushGameNotice({from:playerId,to:id,itemId:inv.id,itemName:meta.name,status:'⚠️ ຖືກຫັກຄະແນນ',kind:'impact',message:`ທີມ ${team.team}: ${team.name} ໃຊ້ ${meta.name} ເຮັດໃຫ້ທີມ ${t.team}: ${t.name} ເສຍ 1 ຄະແນນ`})}});updates['teams/'+playerId+'/score']=team.score+stolen;roomRef.update(updates).then(()=>consumeItem(index));return}
+if(inv.id==='god'){const max=Math.max(...Object.values(state.teams).map(t=>t.score));roomRef.child('teams/'+playerId+'/score').set(max).then(()=>consumeItem(index));return}
+if(inv.id==='parallel'&&target){const updates={};updates['teams/'+playerId+'/score']=state.teams[target].score;updates['teams/'+target+'/score']=team.score;roomRef.update(updates).then(()=>consumeItem(index));return}
+if(inv.id==='half'||inv.id==='cut'){roomRef.child('teams/'+playerId+'/halfLeft').set(inv.id==='half'?3:1).then(()=>consumeItem(index));return}
+if(inv.id==='boardwipe'){const updates={};Object.entries(state.teams).forEach(([id,t])=>{updates['teams/'+id+'/score']=0;if(id!==playerId)pushGameNotice({from:playerId,to:id,itemId:inv.id,itemName:meta.name,status:'⚠️ ຄະແນນຖືກລ້າງ',kind:'impact',message:`ທີມ ${team.team}: ${team.name} ໃຊ້ ${meta.name} ລ້າງຄະແນນຂອງທຸກທີມ`})});updates['game/round']=0;updates['game/answered']={};roomRef.update(updates).then(()=>consumeItem(index));return}
+if(inv.id==='double'){showChoiceModal('🔋 ເລືອກໄອເທັມ',team.inventory.map((x,i)=>({label:ITEMS.find(z=>z.id===x.id)?.name||x.id,value:i})).filter(x=>x.value!==index),i=>{const arr=team.inventory.map((x,j)=>j===i?{...x,charges:(x.charges||1)+1}:x);roomRef.child('teams/'+playerId+'/inventory').set(arr).then(()=>consumeItem(index))});return}
+if(inv.id==='pick'){const fx={...(state.game.effects?.[playerId]||{}),pick:true};roomRef.child('game/effects/'+playerId).set(fx).then(()=>consumeItem(index));return}
+if(inv.id==='heaven'){roomRef.child('teams/'+playerId+'/heaven').set((team.heaven||0)+1).then(()=>consumeItem(index));return}
+if(inv.id==='zombie'){const used=state.game?.usedItems||[];if(!used.length){alert('ຍັງບໍ່ມີໄອເທັມທີ່ໃຊ້ແລ້ວ');return}showChoiceModal('🧟 ເລືອກໄອເທັມກັບຄືນ',used.map(id=>({label:ITEMS.find(z=>z.id===id)?.name||id,value:id})),id=>roomRef.child('teams/'+playerId+'/inventory').set([...team.inventory,{id,charges:1}]).then(()=>consumeItem(index)));return}
+if(inv.id==='heartbox'&&target){const targetTeam=state.teams[target];const invs=targetTeam.inventory||[];if(!invs.length){alert('ທີມນີ້ບໍ່ມີໄອເທັມ');return}const stealId=prompt('ໄອເທັມທີ່ຂະໂມຍໄດ້:\n'+invs.map(x=>x.id).join('\n'));const i=invs.findIndex(x=>x.id===stealId);if(i>=0){const copy=JSON.parse(JSON.stringify(invs[i]));invs.splice(i,1);const updates={};updates['teams/'+target+'/inventory']=invs;updates['teams/'+playerId+'/inventory']=[...team.inventory,copy];roomRef.update(updates).then(()=>consumeItem(index))}return}
+if(target){applyAttack(inv.id,playerId,target).then(()=>consumeItem(index));return}
+consumeItem(index)}
+function useItemTarget(index,target){const currentTeam=state.teams?.[playerId];if(!currentTeam||Number(currentTeam.answered||0)>=15||!currentTeam.alive||state.phase!=='game'){closeModal();renderInventory();if(currentTeam&&Number(currentTeam.answered||0)>=15)alert('🔒 ທ່ານຕອບຄົບ 15 ຂໍ້ແລ້ວ ບໍ່ສາມາດໃຊ້ໄອເທັມໄດ້');return}const meta=ITEMS.find(x=>x.id===currentTeam.inventory?.[index]?.id);if(!meta)return;const actor=state.teams?.[playerId],targetTeam=state.teams?.[target];pushGameNotice({from:playerId,to:target,itemId:meta.id,itemName:meta.name,status:'🎯 ເລືອກເປົ້າໝາຍ',kind:'impact',message:`ທີມ ${actor?.team}: ${actor?.name} ເລືອກໃຊ້ ${meta.name} ກັບ ທີມ ${targetTeam?.team}: ${targetTeam?.name}`});if(meta.id==='heartbox'){const invs=state.teams[target]?.inventory||[];if(!invs.length){alert('ທີມນີ້ບໍ່ມີໄອເທັມ');return}showChoiceModal('🎁 ເລືອກໄອເທັມ',invs.map((x,i)=>({label:(ITEMS.find(z=>z.id===x.id)?.name||x.id),value:i})),i=>{const own=state.teams[playerId].inventory.slice(),other=state.teams[target].inventory.slice();const stolen=other.splice(i,1)[0];roomRef.update({['teams/'+target+'/inventory']:other,['teams/'+playerId+'/inventory']:[...own,stolen]}).then(()=>consumeItem(index))});return}if(meta.id==='parallel'){const a=state.teams[playerId].score,b=state.teams[target].score;roomRef.update({['teams/'+playerId+'/score']:b,['teams/'+target+'/score']:a}).then(()=>consumeItem(index));return}applyAttack(meta.id,playerId,target).then(()=>consumeItem(index))}
+function updateScore(id,delta){roomRef.child('teams/'+id+'/score').set((state.teams[id].score||0)+delta)}
+function consumeItem(index){const team=state.teams?.[playerId];if(!team)return;const inv=[...team.inventory],used=inv[index];if(!used)return;const charges=(used.charges||1)-1;if(charges<=0)inv.splice(index,1);else inv[index]={...used,charges};roomRef.update({['teams/'+playerId+'/inventory']:inv,['game/usedItems']:[...(state.game?.usedItems||[]),used.id]})}
+function applyAttack(itemId,from,to){
+ const victim=state.teams?.[to];if(!victim)return Promise.resolve();
+ const armorIds=(victim.inventory||[]).filter(x=>['shield','reflect','diamondarmor','ironarmor','scatterarmor'].includes(x.id)).map(x=>x.id);
+ // ຖ້າມີເກາະ ໃຫ້ເລືອກວ່າຈະໃຊ້ເກາະອັນໃດ ພາຍໃນ 5 ວິນາທີ
+ if(armorIds.length){
+  const existing=state.game?.effects?.[to]?.incomingPrompt;
+  if(existing?.status==='pending'||existing?.status==='resolving')return Promise.resolve();
+  const prompt={itemId,from,armorIds:[...new Set(armorIds)],createdAt:Date.now(),expiresAt:Date.now()+5000,status:'pending'};
+  return roomRef.child('game/effects/'+to+'/incomingPrompt').set(prompt);
+ }
+ return doAttack(itemId,from,to);
+}
+function resolveIncomingAttack(armorChoice=null){
+ if(role!=='player'||!playerId)return;
+ const prompt=state?.game?.effects?.[playerId]?.incomingPrompt;
+ if(!prompt||prompt.status!=='pending')return;
+ const useArmor=typeof armorChoice==='string'&&armorChoice.length>0;
+ const promptKey=String(prompt.createdAt)+':'+prompt.itemId+':'+prompt.from;
+ if(incomingPromptKey&&incomingPromptKey!==promptKey)return;
+ const promptRef=roomRef.child('game/effects/'+playerId+'/incomingPrompt');
+ promptRef.transaction(current=>{if(!current||current.status!=='pending'||String(current.createdAt)+':'+current.itemId+':'+current.from!==promptKey)return;return {...current,status:'resolving',choice:useArmor?'armor':'take',armorId:useArmor?armorChoice:null,resolvedAt:Date.now()};}).then(result=>{
+  if(!result.committed)return;
+  if(incomingPromptTimer){clearInterval(incomingPromptTimer);incomingPromptTimer=null;}
+  incomingPromptKey=null;
+  const chosen=result.snapshot.val();
+  const clearPrompt=()=>promptRef.remove();
+  if(!useArmor)return clearPrompt().then(()=>doAttack(chosen.itemId,chosen.from,playerId));
+  const team=state?.teams?.[playerId];const inv=[...(team?.inventory||[])];const idx=inv.findIndex(x=>x.id===chosen.armorId&&['shield','reflect','diamondarmor','ironarmor','scatterarmor'].includes(x.id));
+  // ຖ້າເກາະທີ່ເລືອກບໍ່ຢູ່ແລ້ວ ໃຫ້ການໂຈມຕີເຂົ້າຕາມປົກກະຕິ
+  if(idx<0)return clearPrompt().then(()=>doAttack(chosen.itemId,chosen.from,playerId));
+  const armor=inv.splice(idx,1)[0];
+  return roomRef.child('teams/'+playerId+'/inventory').set(inv).then(()=>clearPrompt()).then(()=>{
+   if(armor.id==='reflect'){
+    // ສະທ້ອນໄອເທັມກັບຫາຜູ້ສົ່ງ; ຖ້າຜູ້ສົ່ງມີເກາະ ລາວຈະໄດ້ເລືອກປ້ອງກັນພາຍໃນ 5 ວິນາທີ
+    return applyAttack(chosen.itemId,playerId,chosen.from);
+   }
+   if(armor.id==='scatterarmor')return Promise.all(Object.keys(state.teams||{}).filter(id=>id!==playerId&&id!==chosen.from).map(id=>applyAttack(chosen.itemId,playerId,id)));
+   // shield/diamond/iron armor: ບລັອກການໂຈມຕີຄັ້ງນີ້
+   const attacker=state?.teams?.[chosen.from],victim=state?.teams?.[playerId],attackMeta=ITEMS.find(x=>x.id===chosen.itemId);
+   return pushGameNotice({from:chosen.from,to:playerId,itemId:chosen.itemId,itemName:attackMeta?.name||chosen.itemId,status:'🛡️ ປ້ອງກັນສຳເລັດ',kind:'impact',message:`ທີມ ${attacker?.team}: ${attacker?.name} ໃຊ້ ${attackMeta?.name||chosen.itemId} ໃສ່ ທີມ ${victim?.team}: ${victim?.name} ແຕ່ເກາະ ${armor.name} ບລັອກໄວ້`});
+  });
+ }).catch(err=>console.error('resolveIncomingAttack',err));
+}
+function renderIncomingAttackPrompt(){
+ if(role!=='player'||!playerId||!state?.game)return;
+ const prompt=state.game.effects?.[playerId]?.incomingPrompt;
+ const root=$('modalRoot');
+ if(!prompt||prompt.status!=='pending'){
+  if(incomingPromptTimer){clearInterval(incomingPromptTimer);incomingPromptTimer=null;}
+  incomingPromptKey=null;
+  if(root?.querySelector('[data-incoming-attack]'))root.innerHTML='';
+  return;
+ }
+ const key=String(prompt.createdAt)+':'+prompt.itemId+':'+prompt.from;
+ if(incomingPromptKey===key&&root?.querySelector('[data-incoming-attack]')){const countdown=root.querySelector('[data-incoming-countdown]');if(countdown)countdown.textContent=Math.max(0,Math.ceil((Number(prompt.expiresAt)-Date.now())/1000));return;}
+ incomingPromptKey=key;
+ if(incomingPromptTimer)clearInterval(incomingPromptTimer);
+ const meta=ITEMS.find(x=>x.id===prompt.itemId);const attacker=state.teams?.[prompt.from];
+ const available=(prompt.armorIds||[prompt.armorId].filter(Boolean)).filter((id,i,arr)=>arr.indexOf(id)===i);
+ const armorButtons=available.map(id=>{const armor=ITEMS.find(x=>x.id===id);return `<button class="gold" onclick="resolveIncomingAttack('${esc(id)}')">${esc(armor?.icon||'🛡️')} ໃຊ້${esc(armor?.name||id)}</button>`}).join('');
+ root.innerHTML=`<div class="overlay" data-incoming-attack><div class="panel" style="width:min(560px,100%);text-align:center;max-height:90vh;overflow:auto"><div class="big">⚠️</div><h2>ກຳລັງຈະຖືກໂຈມຕີ!</h2><div class="notice"><div style="font-size:24px">${esc(meta?.icon||'⚔️')} ${esc(meta?.name||prompt.itemId)}</div><p>ທີມ ${esc(String(attacker?.team||'?'))}: ${esc(attacker?.name||'ທີມອື່ນ')} ສົ່ງໄອເທັມນີ້ມາຫາທ່ານ</p><p>ເລືອກເກາະທີ່ຈະໃຊ້ປ້ອງກັນ (ໃຊ້ໄດ້ 1 ອັນ)</p></div><p>ເວລາຕັດສິນໃຈ: <strong data-incoming-countdown>5</strong> ວິນາທີ</p><div class="actions" style="justify-content:center;flex-wrap:wrap">${armorButtons}<button class="danger" onclick="resolveIncomingAttack(null)">⚔️ ບໍ່ໃຊ້ເກາະ</button></div><p class="small muted">ຖ້າໝົດເວລາ ລະບົບຈະບໍ່ໃຊ້ເກາະ</p></div></div>`;
+ const tick=()=>{if(incomingPromptKey!==key){clearInterval(incomingPromptTimer);incomingPromptTimer=null;return;}const left=Math.max(0,Math.ceil((Number(prompt.expiresAt)-Date.now())/1000));const el=root.querySelector('[data-incoming-countdown]');if(el)el.textContent=left;if(left<=0){clearInterval(incomingPromptTimer);incomingPromptTimer=null;resolveIncomingAttack(null);}};
+ tick();incomingPromptTimer=setInterval(tick,200);
+}
+function doAttack(itemId,from,to){
+ const victim=state.teams[to];if(!victim)return Promise.resolve();
+ const fx={...(state.game.effects?.[to]||{})},updates={};
+ const meta=ITEMS.find(x=>x.id===itemId),attacker=state.teams[from];
+ const actionName=meta?.name||itemId;
+ const sourceName=`ທີມ ${attacker?.team||'?'}: ${attacker?.name||'ບໍ່ຮູ້ຊື່'}`;
+ fx.notice={id:Date.now(),title:itemId==='kill'?'💀 ທ່ານຖືກສັງຫານໂຫດ!':`⚠️ ທ່ານກຳລັງຖືກໃຊ້ຟັງຊັນ: ${actionName}`,detail:`ຜູ້ສົ່ງ: ${sourceName}`,itemId,from,at:Date.now(),lost:itemId==='kill'};
+ if(itemId==='kill'){updates['teams/'+to+'/alive']=false;fx.eliminated=true;fx.eliminatedBy={itemId,from,fromName:sourceName,itemName:actionName,at:Date.now()};}
+ else if(itemId==='poison')fx.poison=true;
+ else if(itemId==='hellheart')updates['teams/'+to+'/hellheart']=(victim.hellheart||0)+1;
+ else if(itemId.startsWith('timeminus')){const sec=Number(itemId.replace('timeminus',''))||3;updates['teams/'+to+'/timePenalty']={seconds:sec,remaining:3};if(state.phase==='game'&&state.game?.deadlines?.[to])updates['game/deadlines/'+to]=Math.max(Date.now()+1000,state.game.deadlines[to]-sec*1000);}
+ else if(['virus','sandstorm','meteor','flip','blink','meme'].includes(itemId)||itemId.startsWith('meme')){fx.visual=itemId;fx.visualUntil=Date.now()+7000}
+ else if(itemId==='penalty')updates['game/penaltyMode']=true;
+ updates['game/effects/'+to]=fx;
+ const noticeMessage=itemId==='kill'?`${sourceName} ໃຊ້ ${actionName} ແລະຄັດອອກ ທີມ ${victim.team}: ${victim.name}`:`${sourceName} ໃຊ້ ${actionName} ກັບ ທີມ ${victim.team}: ${victim.name}`;
+ return roomRef.update(updates).then(()=>pushGameNotice({from,to,itemId,itemName:actionName,status:itemId==='kill'?'💀 ຖືກຄັດອອກ':'⚠️ ມີຜົນກະທົບ',kind:itemId==='kill'?'loss':'impact',message:noticeMessage}));
+}
+function showEffect(id,effect){if(playerId!==id)return;const root=$('overlayRoot');const fx=state?.game?.effects?.[id]||{};const until=Number(fx.visualUntil||0);if(until<=Date.now())return;root.innerHTML='';if(localOverlayTimer){clearTimeout(localOverlayTimer);localOverlayTimer=null}if(effect.startsWith('meme')){const memeNo=Number(effect.slice(4))||1;const meme=MEMES[memeNo-1]||MEMES[0];root.innerHTML=`<div class="overlay"><div><div class="meme">${meme[0]}</div><div class="big">${meme[0]} ${esc(meme[1])}</div></div></div>`}else if(effect==='meteor'){root.innerHTML='<div class="overlay"><div class="big">☄️</div></div>'}else if(effect==='virus'){document.body.classList.add('fall')}else if(effect==='sandstorm'){document.body.classList.add('storm','sand')}else if(effect==='flip'){const stage=document.querySelector('.wrap');if(stage){stage.classList.add('flip');let flips=0;const flipTimer=setInterval(()=>{stage.classList.toggle('flip');if(++flips>=3)clearInterval(flipTimer)},1750);setTimeout(()=>{clearInterval(flipTimer);stage.classList.remove('flip')},7000)}}else if(effect==='blink'){document.body.classList.add('blink')}localOverlayTimer=setTimeout(()=>{root.innerHTML='';document.body.classList.remove('fall','storm','sand','flip','blink');document.querySelector('.wrap')?.classList.remove('flip');localOverlayTimer=null;const latest=state?.game?.effects?.[id]||{};if(latest.visual===effect&&Number(latest.visualUntil||0)<=Date.now())roomRef.child('game/effects/'+id+'/visual').remove()},Math.max(0,until-Date.now()))}
+function toggleHostScores(){
+ hostScoresVisible=!hostScoresVisible;
+ const board=$('hostScoreBoard'),btn=$('toggleHostScoresBtn');
+ if(board)board.classList.toggle('hidden',!hostScoresVisible);
+ if(btn)btn.textContent=hostScoresVisible?'🙈 ເຊື່ອງຄະແນນທຸກທີມ':'👁️ ແສດງຄະແນນທຸກທີມ';
+ renderHostGame();
+}
+function renderHostScoreBoard(){
+ const board=$('hostScoreBoard');if(!board)return;
+ const teams=Object.entries(state?.teams||{}).sort((a,b)=>Number(a[1].team)-Number(b[1].team));
+ board.innerHTML=teams.map(([id,t])=>`<div class="host-score-card"><div><b>ທີມ ${esc(t.team)}: ${esc(t.name)}</b></div><div class="host-score-value">${Number(t.score||0)} ຄະແນນ</div><div class="small ${t.alive?'muted':'dangertext'}">${t.alive?'🟢 ຍັງຢູ່ໃນເກມ':'❌ ຖືກຄັດອອກ'}</div></div>`).join('');
+ board.classList.toggle('hidden',!hostScoresVisible);
+}
+function pushGameNotice(event){
+ if(!roomRef)return Promise.resolve();
+ const from=event.from?state?.teams?.[event.from]:null,to=event.to?state?.teams?.[event.to]:null;
+ const payload={id:Date.now(),at:Date.now(),from:event.from||'',to:event.to||'',fromTeam:from?.team??'',fromName:from?.name||'',toTeam:to?.team??'',toName:to?.name||'',itemId:event.itemId||'',itemName:event.itemName||ITEMS.find(x=>x.id===event.itemId)?.name||event.itemId||'ຟັງຊັນ',message:event.message||'',kind:event.kind||'function',status:event.status||'ໃຊ້ຟັງຊັນ'};
+ return roomRef.child('game/notifications').push(payload).catch(err=>console.warn('notification',err));
+}
+function renderLiveFeeds(){
+ const all=Object.values(state?.game?.notifications||{}).sort((a,b)=>Number(b.at||b.id||0)-Number(a.at||a.id||0)).slice(0,12);
+ const host=$('hostLiveFeed');if(host)host.innerHTML=all.map(n=>`<div class="live-event ${n.kind==='loss'?'loss':n.to?'impact':''}"><b>${esc(n.status||'🔔 ແຈ້ງເຕືອນ')}: ${esc(n.itemName||'ຟັງຊັນ')}</b><div>${esc(n.message||'')}</div><div class="small muted">${new Date(Number(n.at||Date.now())).toLocaleTimeString()}</div></div>`).join('')||'<div class="muted small">ຍັງບໍ່ມີການໃຊ້ຟັງຊັນ</div>';
+ const player=$('playerLiveFeed');if(player){const mine=all.filter(n=>n.from===playerId||n.to===playerId);player.innerHTML=mine.map(n=>`<div class="live-event ${n.kind==='loss'?'loss':n.to?'impact':''}"><b>${esc(n.status||'🔔 ແຈ້ງເຕືອນ')}: ${esc(n.itemName||'ຟັງຊັນ')}</b><div>${esc(n.message||'')}</div><div class="small muted">${new Date(Number(n.at||Date.now())).toLocaleTimeString()}</div></div>`).join('')||'<div class="muted small">ການແຈ້ງເຕືອນທີ່ກ່ຽວກັບທີມທ່ານຈະສະແດງຢູ່ນີ້</div>';}
+}
+function renderHostGame(){const teams=Object.entries(state.teams||{}).sort((a,b)=>a[1].team-b[1].team);$('hostRound').textContent=`ຮອບ ${state.game?.round||0}/15`;const left=Math.max(0,Math.ceil(((state.game?.endsAt||Date.now())-Date.now())/1000));$('hostGameTimer').textContent=String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0');$('hostTeams').innerHTML=teams.map(([id,t])=>{const q=state.game?.questionByTeam?.[id],ans=state.game?.answered?.[id];return `<div class="teamview"><div class="between"><h3>ທີມ ${t.team}: ${esc(t.name)}</h3><span class="pill">${hostScoresVisible?`${Number(t.score||0)} ຄະແນນ`:`ຄະແນນ •••`}</span></div><div class="wallet-line"><b>💰 ເງິນຄົງເຫຼືອ</b><strong>${Math.max(0,Number(t.money??100))} 🪙</strong></div><div class="money-track"><div class="money-fill ${Number(t.money??100)<=20?'low':''}" style="width:${Math.max(0,Math.min(100,Number(t.money??100)))}%"></div></div><div class="small muted" style="margin-top:8px">ໄອເທັມ ${(t.inventory||[]).length} • ຕອບແລ້ວ ${t.answered||0}/15</div>${!t.alive?'<b class="dangertext">ແພ້ / ຖືກຄັດອອກ</b>':''}${q?`<div class="qtext">${q.question}</div><div class="choices">${(q.choices||[]).map(c=>`<div class="choice">${c}</div>`).join('')}</div>`:'<p class="muted">ລໍຖ້າຄຳຖາມ</p>'}<div class="notice">${ans?`${ans.correct?'✅ ຕອບຖືກ':'❌ ຕອບຜິດ'} • ຄຳຕອບ: ${esc(ans.choice)}`:'⏳ ກຳລັງຕອບ…'}</div><div class="small">🎒 ${(t.inventory||[]).map(i=>(ITEMS.find(x=>x.id===i.id)||{}).name||i.id).join('、')||'ບໍ່ມີໄອເທັມ'}</div></div>`}).join('');renderHostScoreBoard();renderLiveFeeds();const allDone=teams.length===4&&teams.every(([id,t])=>!t.alive||Number(t.answered||0)>=15);$('hostActions').innerHTML=teams.map(([id,t])=>`<button class="secondary" onclick="hostEliminate('${id}')">ຄັດອອກ: ${esc(t.name)}</button>`).join('')+(allDone?`<button class="gold" onclick="openWinnerPage()">🏆 แสดงผู้ชนะ</button>`:'<span class="muted small">🏆 ปุ่มแสดงผู้ชนะจะปรากฏเมื่อทุกทีมตอบครบ 15 ข้อหรือถูกคัดออก</span>');if(window.MathJax&&typeof MathJax.typesetPromise==='function')MathJax.typesetPromise([$ ('hostTeams')]).catch(()=>{})}
+let winnerRevealTimers=[];
+function closeWinnerScreen(){
+ winnerRevealTimers.forEach(clearTimeout);winnerRevealTimers=[];
+ const screen=$('winnerScreenOverlay');if(screen){screen.classList.add('hidden');screen.innerHTML='';}
+}
+function openWinnerPage(){
+ if(role!=='host'||!roomId||!state?.teams)return;
+ winnerRevealTimers.forEach(clearTimeout);winnerRevealTimers=[];
+ const all=Object.entries(state.teams||{}).map(([id,t])=>({id,...t})).sort((a,b)=>Number(b.score||0)-Number(a.score||0)||Number(a.team||0)-Number(b.team||0));
+ if(!all.length)return;
+ const ranked=all.slice(0,4);
+ const rankMeta={1:{emoji:'🥇',label:'อันดับ 1',cls:'rank1'},2:{emoji:'🥈',label:'อันดับ 2',cls:'rank2'},3:{emoji:'🥉',label:'อันดับ 3',cls:'rank3'},4:{emoji:'🎖️',label:'อันดับ 4',cls:'rank4'}};
+ const card=(rank,team)=>{const m=rankMeta[rank];return `<div id="winnerRank${rank}" class="winner-step ${m.cls} reveal-hidden"><div class="winner-place">${m.emoji} ${m.label}</div><div class="winner-name">${esc(team?.name||'ບໍ່ມີທີມ')}</div><div class="winner-score">${Number(team?.score||0)} ຄະແນນ</div></div>`};
+ const byRank={};ranked.forEach((t,i)=>byRank[i+1]=t);
+ const screen=$('winnerScreenOverlay');
+ screen.innerHTML=`<div class="winner-screen-inner"><h1 class="winner-screen-title">🏆 ປະກາດຜົນຜູ້ຊະນະ 🏆</h1><p class="winner-screen-subtitle">ຜົນການແຂ່ງຂັນ • GAME SHOW BATTLE</p><div class="winner-pyramid">${card(1,byRank[1])}${card(2,byRank[2])}${card(3,byRank[3])}${card(4,byRank[4])}</div><button id="winnerScreenClose" class="winner-screen-close hidden" onclick="closeWinnerScreen()">ປິດໜ້າຜູ້ຊະນະ</button></div>`;
+ screen.classList.remove('hidden');
+ // Reveal in the requested suspense order: 3, 2, 1, then 4 at the bottom.
+ [3,2,1,4].forEach((rank,index)=>winnerRevealTimers.push(setTimeout(()=>{
+   const el=$('winnerRank'+rank);if(el){el.classList.remove('reveal-hidden');el.classList.add('revealed');}
+   if(rank===4){const close=$('winnerScreenClose');if(close)close.classList.remove('hidden');}
+ },900+index*1600)));
+ roomRef?.child('game/winnerRevealAt').set(Date.now()).catch(()=>{});
+}
+function hostEliminate(id){if(confirm('ຄັດອອກທີມນີ້?'))roomRef.child('teams/'+id+'/alive').set(false)}
+function renderAll(){if(!state)return;renderLiveFeeds();
+ if(role==='player')renderIncomingAttackPrompt();
+ if(state.phase==='countdown'){const root=$('overlayRoot');if(!root.dataset.countdown){root.dataset.countdown='1';let n=3;root.innerHTML='<div class="overlay"><div><div class="big">ເຕັມພ້ອມ!</div><div class="big" id="countNum">3</div><p>ກຽມຕົວຕອບຄຳຖາມ</p></div></div>';const tick=setInterval(()=>{n--;$('countNum')&&($('countNum').textContent=Math.max(0,n));if(n<=0){clearInterval(tick);root.innerHTML='';delete root.dataset.countdown}},1000)}}else{const activeVisual=role==='player'&&state?.game?.effects?.[playerId]?.visual&&Number(state.game.effects[playerId].visualUntil||0)>Date.now();if(!activeVisual){$('overlayRoot').innerHTML='';delete $('overlayRoot').dataset.countdown}}
+ if(role==='host'){if(state.phase==='lobby'){showOnly('hostLobby');renderLobby()}else if(state.phase==='auction'){showOnly('hostAuction');renderAuctionItems('hostAuctionItems');renderAuctionDashboard('host');$('auctionTeamCount').textContent=`ຄົບ ${playersList().length}/4 ທີມ`}else{showOnly('hostGame');renderHostGame()}}else if(role==='player'){if(state.phase==='lobby'&&!state.players?.[playerId]){showOnly('playerJoin')}else if(state.phase==='auction'){showOnly('playerAuction');renderAuctionItems('playerAuctionItems');renderAuctionDashboard('player')}else{showOnly('playerGame');renderPlayerQuestion();renderInventory();const left=Math.max(0,Math.ceil(((state.game?.deadlines?.[playerId]||Date.now())-Date.now())/1000));$('playerGameTimer').textContent=left+'s';const fx=state.game?.effects?.[playerId];if(fx?.visual&&fx.visualUntil>Date.now()&&window.lastVisualKey!==fx.visual+':'+fx.visualUntil){window.lastVisualKey=fx.visual+':'+fx.visualUntil;showEffect(playerId,fx.visual)}}}}
+function resetRoom(){if(confirm('ລຶບຂໍ້ມູນຫ້ອງ ແລະເລີ່ມໃໝ່?'))roomRef.remove().then(()=>backHome())}
+function finishGame(){if(role!=='host')return;const teams=Object.values(state.teams||{}).sort((a,b)=>b.score-a.score);roomRef.update({phase:'finished'});$('modalRoot').innerHTML=`<div class="overlay"><div class="panel"><div class="big">🏆</div><h2>ສະຫຼຸບຜົນເກມ</h2>${teams.map((t,i)=>`<p>${i+1}. ${esc(t.name)} — <b>${t.score}</b> ຄະແນນ</p>`).join('')}<button onclick="closeModal()">ປິດ</button></div></div>`}
+function showQuestionBank(){const json=JSON.stringify(state.questions||SAMPLE_QUESTIONS,null,2);$('modalRoot').innerHTML=`<div class="overlay"><div class="panel" style="width:min(850px,100%);max-height:90vh;overflow:auto" onclick="event.stopPropagation()"><h2>📚 ຄຳຖາມ JSON</h2><p class="muted">ໃສ່ JSON array ທີ່ມີ question, choices, answer. ສູດ MathJax ໃຊ້ \\\\( ... \\\\).</p><textarea id="questionJson">${esc(json)}</textarea><div class="actions"><button onclick="saveQuestionBank()">ບັນທຶກ</button><button class="secondary" onclick="closeModal()">ປິດ</button></div><p id="jsonError" class="dangertext"></p></div></div>`}
+function saveQuestionBank(){try{const q=JSON.parse($('questionJson').value);if(!Array.isArray(q)||!q.length||!q.every(x=>x.question&&Array.isArray(x.choices)&&x.answer))throw Error('ຮູບແບບ JSON ບໍ່ຖືກຕ້ອງ');roomRef.child('questions').set(q).then(()=>{closeModal();alert('ບັນທຶກຄຳຖາມແລ້ວ')})}catch(e){$('jsonError').textContent=e.message}}
+function showSetup(){$('modalRoot').innerHTML=`<div class="overlay"><div class="panel" style="max-width:720px;text-align:left;max-height:90vh;overflow:auto"><h2>⚙️ ຕັ້ງຄ່າ Firebase</h2><p>1. ເປີດ Firebase Console → Realtime Database ແລະສ້າງ database.</p><p>2. ຄັດລອກ Database URL ທີ່ Firebase ສະແດງ ໄປໃສ່ <code>databaseURL</code> ໃນ code (URL ອາດເປັນ <code>...firebasedatabase.app</code> ຫຼື <code>...firebaseio.com</code>).</p><p>3. ຕັ້ງ Rules ສຳລັບທົດລອງໃຫ້ອະນຸຍາດ read/write. ຢ່າໃຊ້ public rules ກັບເກມທີ່ໃຊ້ຈິງ.</p><p>4. ໂຮສໄຟລ໌ຜ່ານ HTTPS ເຊັ່ນ Firebase Hosting.</p><p class="dangertext">ໝາຍເຫດ: ນີ້ແມ່ນໂຄງສ້າງເກມສະບັບຕົ້ນແບບ. ຄວນເພີ່ມ Firebase Authentication ແລະ Security Rules ກ່ອນໃຊ້ງານສາທາລະນະ.</p><button onclick="closeModal()">ເຂົ້າໃຈແລ້ວ</button></div></div>`}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+setInterval(()=>{if(!state)return;if(state.phase==='auction'){maybeCloseAuction();renderAuctionDashboard(role==='host'?'host':'player');}if(state.phase==='game'&&role==='host'){renderHostGame();for(const [id,t] of Object.entries(state.teams||{})){if(t.alive&&Number(t.answered||0)<15&&state.game?.questionByTeam?.[id]&&Date.now()>=Number(state.game?.deadlines?.[id]||Infinity))advanceTeamQuestion(id,null,true);}}if(state.phase==='game'&&role==='player'&&state.teams?.[playerId]?.alive&&Number(state.teams[playerId].answered||0)<15&&state.game?.questionByTeam?.[playerId]&&Date.now()>=Number(state.game?.deadlines?.[playerId]||Infinity))advanceTeamQuestion(playerId,null,true);if((state.phase==='game'||state.phase==='countdown')&&role==='player'){const left=Math.max(0,Math.ceil(((state.game?.deadlines?.[playerId]||Date.now())-Date.now())/1000));$('playerGameTimer').textContent=left+'s';}},1000);
+</script>
+</body></html>
