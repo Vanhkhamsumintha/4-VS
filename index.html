@@ -125,7 +125,7 @@ function changeAuctionCategory(category){
 }
 
 const $=id=>document.getElementById(id);
-const MEMES=[["💪", "สู้ ๆ นะ เป็นกำลังใจให้!"], ["🤔", "ตอบไม่ได้เหรอ?"], ["😅", "ไหวเปล่าเนี่ย?"], ["😂", "คิดนานจังเลย!"], ["😎", "ข้อแค่นี้เอง!"], ["🙈", "อย่าแอบดูคำตอบนะ"], ["🧠", "สมองกำลังโหลด..."], ["🐢", "ช้ากว่าเต่าอีก!"], ["🔥", "เอาใจช่วยนะ!"], ["👀", "ทุกคนรอดูอยู่!"], ["🤣", "ขำก่อนตอบก็ได้"], ["🎯", "มั่นใจคำตอบไหม?"], ["😴", "ตื่นได้แล้ว!"], ["🚀", "เร่งเครื่องหน่อย!"], ["🏆", "เก่งมากถ้าตอบได้!"]];
+const MEMES=[["💪", "ສູ້ໆ ເດີ ເປັນກຳລັງໃຈໃຫ້!"], ["🤔", "ຕອບບໍ່ໄດ້ບໍ?"], ["😅", "ໄຫວບໍ?"], ["😂", "ຄິດດົນແທ້!"], ["😎", "ມີແຕ່ຂໍ້ງ່າຍໆ!"], ["🙈", "ຢ່າແອບເບິ່ງຄຳຕອບເດີ"], ["🧠", "ສະໝອງກຳລັງໂຫຼດ..."], ["🐢", "ຊ້າກວ່າເຕົ່າອີກ!"], ["🔥", "ເປັນກຳລັງໃຈໃຫ້!"], ["👀", "ທຸກຄົນກຳລັງລໍຖ້າເບິ່ງ!"], ["🤣", "ຫົວກ່ອນຕອບກໍໄດ້"], ["🎯", "ໝັ້ນໃຈກັບຄຳຕອບບໍ?"], ["😴", "ຕື່ນໄດ້ແລ້ວ!"], ["🚀", "ເລັ່ງມືແນ່!"], ["🏆", "ເກັ່ງຫຼາຍຖ້າຕອບໄດ້!"]];
 const ITEMS=[
 {id:'question',name:'ຄຳຖາມ',icon:'❓',desc:'ຊຸດຄຳຖາມສຳລັບເກມ',kind:'question'},
 {id:'timeplus3',name:'ເພີ່ມເວລາ +3 ວິ',icon:'⏱️',desc:'ເພີ່ມເວລາຕໍ່ຂໍ້ 3 ວິນາທີ',kind:'time',value:3},
@@ -136,21 +136,21 @@ const ITEMS=[
 {id:'timeminus5',name:'ຕັດເວລາ −5 ວິ',icon:'🕒',desc:'ໂຈມຕີທີມອື່ນ 3 ຂໍ້',kind:'attack',value:'time-5'},
 {id:'timeminus7',name:'ຕັດເວລາ −7 ວິ',icon:'🕒',desc:'ໂຈມຕີທີມອື່ນ 3 ຂໍ້',kind:'attack',value:'time-7'},
 {id:'timeminus10',name:'ຕັດເວລາ −10 ວິ',icon:'🕒',desc:'ໂຈມຕີທີມອື່ນ 3 ຂໍ້',kind:'attack',value:'time-10'},
-{id:'meme1',name:"มีม: สู้ ๆ นะ เป็นกำลังใจให้!",icon:"💪",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
-{id:'meme2',name:"มีม: ตอบไม่ได้เหรอ?",icon:"🤔",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
-{id:'meme3',name:"มีม: ไหวเปล่าเนี่ย?",icon:"😅",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
-{id:'meme4',name:"มีม: คิดนานจังเลย!",icon:"😂",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
-{id:'meme5',name:"มีม: ข้อแค่นี้เอง!",icon:"😎",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
-{id:'meme6',name:"มีม: อย่าแอบดูคำตอบนะ",icon:"🙈",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
-{id:'meme7',name:"มีม: สมองกำลังโหลด...",icon:"🧠",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
-{id:'meme8',name:"มีม: ช้ากว่าเต่าอีก!",icon:"🐢",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
-{id:'meme9',name:"มีม: เอาใจช่วยนะ!",icon:"🔥",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
-{id:'meme10',name:"มีม: ทุกคนรอดูอยู่!",icon:"👀",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
-{id:'meme11',name:"มีม: ขำก่อนตอบก็ได้",icon:"🤣",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
-{id:'meme12',name:"มีม: มั่นใจคำตอบไหม?",icon:"🎯",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
-{id:'meme13',name:"มีม: ตื่นได้แล้ว!",icon:"😴",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
-{id:'meme14',name:"มีม: เร่งเครื่องหน่อย!",icon:"🚀",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
-{id:'meme15',name:"มีม: เก่งมากถ้าตอบได้!",icon:"🏆",desc:'ส่งมีมเต็มจอทีมเป้าหมาย 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme1',name:"ມີມ: ສູ້ໆ ເດີ ເປັນກຳລັງໃຈໃຫ້!",icon:"💪",desc:'ສົ່ງມີມເຕັມຈໍຂອງທີມເປົ້າໝາຍ 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme2',name:"ມີມ: ຕອບບໍ່ໄດ້ບໍ?",icon:"🤔",desc:'ສົ່ງມີມເຕັມຈໍຂອງທີມເປົ້າໝາຍ 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme3',name:"ມີມ: ໄຫວບໍ?",icon:"😅",desc:'ສົ່ງມີມເຕັມຈໍຂອງທີມເປົ້າໝາຍ 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme4',name:"ມີມ: ຄິດດົນແທ້!",icon:"😂",desc:'ສົ່ງມີມເຕັມຈໍຂອງທີມເປົ້າໝາຍ 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme5',name:"ມີມ: ມີແຕ່ຂໍ້ງ່າຍໆ!",icon:"😎",desc:'ສົ່ງມີມເຕັມຈໍຂອງທີມເປົ້າໝາຍ 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme6',name:"ມີມ: ຢ່າແອບເບິ່ງຄຳຕອບເດີ",icon:"🙈",desc:'ສົ່ງມີມເຕັມຈໍຂອງທີມເປົ້າໝາຍ 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme7',name:"ມີມ: ສະໝອງກຳລັງໂຫຼດ...",icon:"🧠",desc:'ສົ່ງມີມເຕັມຈໍຂອງທີມເປົ້າໝາຍ 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme8',name:"ມີມ: ຊ້າກວ່າເຕົ່າອີກ!",icon:"🐢",desc:'ສົ່ງມີມເຕັມຈໍຂອງທີມເປົ້າໝາຍ 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme9',name:"ມີມ: ເປັນກຳລັງໃຈໃຫ້!",icon:"🔥",desc:'ສົ່ງມີມເຕັມຈໍຂອງທີມເປົ້າໝາຍ 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme10',name:"ມີມ: ທຸກຄົນກຳລັງລໍຖ້າເບິ່ງ!",icon:"👀",desc:'ສົ່ງມີມເຕັມຈໍຂອງທີມເປົ້າໝາຍ 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme11',name:"ມີມ: ຫົວກ່ອນຕອບກໍໄດ້",icon:"🤣",desc:'ສົ່ງມີມເຕັມຈໍຂອງທີມເປົ້າໝາຍ 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme12',name:"ມີມ: ໝັ້ນໃຈກັບຄຳຕອບບໍ?",icon:"🎯",desc:'ສົ່ງມີມເຕັມຈໍຂອງທີມເປົ້າໝາຍ 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme13',name:"ມີມ: ຕື່ນໄດ້ແລ້ວ!",icon:"😴",desc:'ສົ່ງມີມເຕັມຈໍຂອງທີມເປົ້າໝາຍ 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme14',name:"ມີມ: ເລັ່ງມືແນ່!",icon:"🚀",desc:'ສົ່ງມີມເຕັມຈໍຂອງທີມເປົ້າໝາຍ 7 ວິນາທີ',kind:'attack',value:'meme'},
+{id:'meme15',name:"ມີມ: ເກັ່ງຫຼາຍຖ້າຕອບໄດ້!",icon:"🏆",desc:'ສົ່ງມີມເຕັມຈໍຂອງທີມເປົ້າໝາຍ 7 ວິນາທີ',kind:'attack',value:'meme'},
 {id:'reflect',name:'ເກາະສະທ້ອນ',icon:'🪞',desc:'ສະທ້ອນການໂຈມຕີກັບຄືນ',kind:'armor',value:'reflect'},
 {id:'shield',name:'ເກາະປ້ອງກັນ',icon:'🛡️',desc:'ປ້ອງກັນການໂຈມຕີ 1 ຄັ້ງ',kind:'armor',value:'shield'},
 {id:'half',name:'ຕັດຕົວເລືອກ',icon:'✂️',desc:'ເຫຼືອ 2 ຕົວເລືອກ 3 ຄຳຖາມ',kind:'weapon',value:'half'},
@@ -255,10 +255,10 @@ function renderAuctionItems(targetId){
   const active=!!auction.active&&Number(auction.endsAt||0)>Date.now()&&state?.phase==='auction';
   const canBid=playerView&&role==='player'&&active&&balance>=bidCost;
   const leader=bid.bidderId?(state.players?.[bid.bidderId]||state.teams?.[bid.bidderId]):null;
-  const leaderLabel=bid.bidderId?`ผู้นำประมูล: ทีม ${leader?.team??bid.team??'?'} ${esc(leader?.name||bid.playerName||'')}`:'ยังไม่มีผู้ประมูล';
+  const leaderLabel=bid.bidderId?`ທີມທີ່ນຳປະມູນ: ທີມ ${leader?.team??bid.team??'?'} ${esc(leader?.name||bid.playerName||'')}`:'ຍັງບໍ່ມີຜູ້ປະມູນ';
   const btn=playerView?`<button class="buy-item" ${canBid?'':'disabled'} onclick="buyAuctionItem('${it.id}')">${!active?'⛔ ປິດປະມູນ':balance<bidCost?'💸 ເຫຼຽນບໍ່ພໍ':`🔨 ປະມູນ ${nextPrice} 🪙 (ເສຍ ${bidCost})`}</button>`:'';
   const preview=it.questionData?`<div class="qtext">${esc(it.questionData.question)}</div><div class="choices">${(it.questionData.choices||[]).map((c,i)=>`<div class="choice">${'ABCD'[i]||i+1}. ${esc(c)}</div>`).join('')}</div>`:`<p class="muted">${esc(it.desc||'')}</p>`;
-  return `<div class="item ${it.questionData?'question-auction':''}"><div style="font-size:30px">${it.icon}</div><h3>${esc(it.name)}</h3>${preview}<div class="price-line"><span>ราคาประมูลสูงสุด</span><strong class="price-number">${currentPrice} 🪙</strong></div><p class="small muted">${leaderLabel}</p><p class="small muted">เสนอครั้งต่อไป: ${nextPrice} เหรียญ • กดครั้งนี้เสีย ${bidCost} เหรียญ • เงินที่จ่ายแล้วไม่คืน • ของชิ้นนี้มีเพียง 1 ชิ้น</p>${btn}</div>`;
+  return `<div class="item ${it.questionData?'question-auction':''}"><div style="font-size:30px">${it.icon}</div><h3>${esc(it.name)}</h3>${preview}<div class="price-line"><span>ລາຄາປະມູນສູງສຸດ</span><strong class="price-number">${currentPrice} 🪙</strong></div><p class="small muted">${leaderLabel}</p><p class="small muted">ລາຄາຄັ້ງຕໍ່ໄປ: ${nextPrice} ເຫຼຽນ • ກົດຄັ້ງນີ້ເສຍ ${bidCost} ເຫຼຽນ • ເງິນທີ່ຈ່າຍແລ້ວບໍ່ຄືນ • ໄອເທັມນີ້ມີພຽງ 1 ອັນ</p>${btn}</div>`;
  }).join('');if(window.MathJax&&typeof MathJax.typesetPromise==='function')MathJax.typesetPromise([target]).catch(()=>{});
 }
 
@@ -327,7 +327,7 @@ function buyAuctionItem(itemId){
   if(error){showAuctionMessage('ປະມູນບໍ່ສຳເລັດ: '+error.message);return;}
   if(!committed){showAuctionMessage('ປະມູນບໍ່ໄດ້: ເຫຼຽນບໍ່ພໍ ຫຼື ໝົດເວລາ');return;}
   const latest=snapshot.val()?.auction?.lastPurchase;
-  if(latest)showAuctionMessage(`🔨 ປະມູນສຳເລັດ • ຈ่ายเงินทันที ${latest.bidderId===playerId?'แล้ว':''} • ລາຄາສູງສຸດ ${latest.price} ເຫຼຽນ • ເງິນທີ່ຈ່າຍແລ້ວບໍ່ຄືນ`);
+  if(latest)showAuctionMessage(`🔨 ປະມູນສຳເລັດ • ຈ່າຍເງິນທັນທີ ${latest.bidderId===playerId?'ແລ້ວ':''} • ລາຄາສູງສຸດ ${latest.price} ເຫຼຽນ • ເງິນທີ່ຈ່າຍແລ້ວບໍ່ຄືນ`);
  });
 }
 function showAuctionMessage(message){const el=$('playerAuctionEvent');if(el)el.textContent=message;}
@@ -390,15 +390,15 @@ function showChoiceModal(title,options,onSelect){
  const panel=document.createElement('div');panel.className='panel';
  panel.style.cssText='width:min(540px,100%);max-height:85vh;overflow:auto;text-align:center';
  const heading=document.createElement('h2');heading.textContent=title;panel.appendChild(heading);
- const hint=document.createElement('p');hint.className='muted';hint.textContent='ກົດປຸ່ມເພື່ອເລືອກ • เลือกด้วยปุ่มด้านล่าง';panel.appendChild(hint);
+ const hint=document.createElement('p');hint.className='muted';hint.textContent='ກົດປຸ່ມເພື່ອເລືອກ • ເລືອກດ້ວຍປຸ່ມດ້ານລຸ່ມ';panel.appendChild(hint);
  const buttons=document.createElement('div');buttons.className='grid';buttons.style.cssText='grid-template-columns:1fr;gap:12px;margin:16px 0';
  (options||[]).forEach(opt=>{const b=document.createElement('button');b.className='cyan';b.style.cssText='min-height:58px;font-size:19px';b.textContent=opt.label;b.addEventListener('click',()=>{closeModal();onSelect(opt.value)});buttons.appendChild(b)});
  if(!options?.length){const p=document.createElement('p');p.textContent='ບໍ່ມີຕົວເລືອກ';buttons.appendChild(p)}
  panel.appendChild(buttons);
- const cancel=document.createElement('button');cancel.className='secondary';cancel.textContent='✕ ຍົກເລີກ / ยกเลิก';cancel.addEventListener('click',closeModal);panel.appendChild(cancel);
+ const cancel=document.createElement('button');cancel.className='secondary';cancel.textContent='✕ ຍົກເລີກ';cancel.addEventListener('click',closeModal);panel.appendChild(cancel);
  overlay.addEventListener('click',e=>{if(e.target===overlay)closeModal()});overlay.appendChild(panel);root.appendChild(overlay);
 }
-function useItem(index){const team=state.teams?.[playerId];if(!team)return;if(Number(team.answered||0)>=15){closeModal();renderInventory();alert('🔒 ທ່ານຕອບຄົບ 15 ຂໍ້ແລ້ວ ບໍ່ສາມາດໃຊ້ໄອເທັມໄດ້');return}if(!team.alive||state.phase!=='game')return;if(!team.inventory?.[index])return;const inv=team.inventory[index],meta=ITEMS.find(x=>x.id===inv.id);if(!meta)return;roomRef.child('game/effects/'+playerId+'/notice').set({id:Date.now(),title:`✨ ກຳລັງໃຊ້ຟັງຊັນ: ${meta.name}`,detail:`ທີມ ${team.team}: ${team.name} ກຳລັງໃຊ້ ${meta.name}`,itemId:inv.id,from:playerId,at:Date.now(),lost:false});pushGameNotice({from:playerId,itemId:inv.id,itemName:meta.name,status:'✨ ກຳລັງໃຊ້',kind:'function',message:`ທີມ ${team.team}: ${team.name} ເລີ່ມໃຊ້ຟັງຊັນ ${meta.name}`});if(meta.kind==='armor'){alert('🛡️ เกราะจะป้องกันอัตโนมัติเมื่อถูกโจมตี');return}let target=null;if(meta.kind==='attack'||['parallel','heartbox','poison','hellheart','timeminus3','timeminus5','timeminus7','timeminus10','kill','meme','virus','sandstorm','meteor','flip','blink'].includes(inv.id)){const opts=Object.entries(state.teams).filter(([id,t])=>id!==playerId&&t.alive).map(([id,t])=>({id,name:`ທີມ ${t.team}: ${t.name}`}));if(!opts.length){alert('ບໍ່ມີທີມເປົ້າໝາຍ');return}showChoiceModal('🎯 ເລືອກທີມເປົ້າໝາຍ',opts.map(o=>({label:o.name,value:o.id})),id=>useItemTarget(index,id));return}
+function useItem(index){const team=state.teams?.[playerId];if(!team)return;if(Number(team.answered||0)>=15){closeModal();renderInventory();alert('🔒 ທ່ານຕອບຄົບ 15 ຂໍ້ແລ້ວ ບໍ່ສາມາດໃຊ້ໄອເທັມໄດ້');return}if(!team.alive||state.phase!=='game')return;if(!team.inventory?.[index])return;const inv=team.inventory[index],meta=ITEMS.find(x=>x.id===inv.id);if(!meta)return;roomRef.child('game/effects/'+playerId+'/notice').set({id:Date.now(),title:`✨ ກຳລັງໃຊ້ຟັງຊັນ: ${meta.name}`,detail:`ທີມ ${team.team}: ${team.name} ກຳລັງໃຊ້ ${meta.name}`,itemId:inv.id,from:playerId,at:Date.now(),lost:false});pushGameNotice({from:playerId,itemId:inv.id,itemName:meta.name,status:'✨ ກຳລັງໃຊ້',kind:'function',message:`ທີມ ${team.team}: ${team.name} ເລີ່ມໃຊ້ຟັງຊັນ ${meta.name}`});if(meta.kind==='armor'){alert('🛡️ ເກາະຈະປ້ອງກັນອັດຕະໂນມັດເມື່ອຖືກໂຈມຕີ');return}let target=null;if(meta.kind==='attack'||['parallel','heartbox','poison','hellheart','timeminus3','timeminus5','timeminus7','timeminus10','kill','meme','virus','sandstorm','meteor','flip','blink'].includes(inv.id)){const opts=Object.entries(state.teams).filter(([id,t])=>id!==playerId&&t.alive).map(([id,t])=>({id,name:`ທີມ ${t.team}: ${t.name}`}));if(!opts.length){alert('ບໍ່ມີທີມເປົ້າໝາຍ');return}showChoiceModal('🎯 ເລືອກທີມເປົ້າໝາຍ',opts.map(o=>({label:o.name,value:o.id})),id=>useItemTarget(index,id));return}
 if(inv.id.startsWith('timeplus')){
  const seconds=Number(inv.id.replace('timeplus',''))||3;
  roomRef.update({['teams/'+playerId+'/extraTime']:(team.extraTime||0)+seconds,...(state.phase==='game'&&state.game?.deadlines?.[playerId]?{['game/deadlines/'+playerId]:state.game.deadlines[playerId]+seconds*1000}:{})}).then(()=>consumeItem(index));return;
@@ -493,7 +493,10 @@ function doAttack(itemId,from,to){
  else if(itemId==='poison')fx.poison=true;
  else if(itemId==='hellheart')updates['teams/'+to+'/hellheart']=(victim.hellheart||0)+1;
  else if(itemId.startsWith('timeminus')){const sec=Number(itemId.replace('timeminus',''))||3;updates['teams/'+to+'/timePenalty']={seconds:sec,remaining:3};if(state.phase==='game'&&state.game?.deadlines?.[to])updates['game/deadlines/'+to]=Math.max(Date.now()+1000,state.game.deadlines[to]-sec*1000);}
- else if(['virus','sandstorm','meteor','flip','blink','meme'].includes(itemId)||itemId.startsWith('meme')){fx.visual=itemId;fx.visualUntil=Date.now()+7000}
+ else if(['virus','sandstorm','meteor','flip','blink','meme'].includes(itemId)||itemId.startsWith('meme')){
+   // ສົ່ງຜົນກະທົບໄປຫາທີມເປົ້າໝາຍໂດຍກົງ; ບໍ່ໄດ້ເພີ່ມໄອເທັມເຂົ້າກະເປົ໋າຂອງທີມນັ້ນ.
+   fx.visual=itemId;fx.visualUntil=Date.now()+7000
+  }
  else if(itemId==='penalty')updates['game/penaltyMode']=true;
  updates['game/effects/'+to]=fx;
  const noticeMessage=itemId==='kill'?`${sourceName} ໃຊ້ ${actionName} ແລະຄັດອອກ ທີມ ${victim.team}: ${victim.name}`:`${sourceName} ໃຊ້ ${actionName} ກັບ ທີມ ${victim.team}: ${victim.name}`;
@@ -524,7 +527,7 @@ function renderLiveFeeds(){
  const host=$('hostLiveFeed');if(host)host.innerHTML=all.map(n=>`<div class="live-event ${n.kind==='loss'?'loss':n.to?'impact':''}"><b>${esc(n.status||'🔔 ແຈ້ງເຕືອນ')}: ${esc(n.itemName||'ຟັງຊັນ')}</b><div>${esc(n.message||'')}</div><div class="small muted">${new Date(Number(n.at||Date.now())).toLocaleTimeString()}</div></div>`).join('')||'<div class="muted small">ຍັງບໍ່ມີການໃຊ້ຟັງຊັນ</div>';
  const player=$('playerLiveFeed');if(player){const mine=all.filter(n=>n.from===playerId||n.to===playerId);player.innerHTML=mine.map(n=>`<div class="live-event ${n.kind==='loss'?'loss':n.to?'impact':''}"><b>${esc(n.status||'🔔 ແຈ້ງເຕືອນ')}: ${esc(n.itemName||'ຟັງຊັນ')}</b><div>${esc(n.message||'')}</div><div class="small muted">${new Date(Number(n.at||Date.now())).toLocaleTimeString()}</div></div>`).join('')||'<div class="muted small">ການແຈ້ງເຕືອນທີ່ກ່ຽວກັບທີມທ່ານຈະສະແດງຢູ່ນີ້</div>';}
 }
-function renderHostGame(){const teams=Object.entries(state.teams||{}).sort((a,b)=>a[1].team-b[1].team);$('hostRound').textContent=`ຮອບ ${state.game?.round||0}/15`;const left=Math.max(0,Math.ceil(((state.game?.endsAt||Date.now())-Date.now())/1000));$('hostGameTimer').textContent=String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0');$('hostTeams').innerHTML=teams.map(([id,t])=>{const q=state.game?.questionByTeam?.[id],ans=state.game?.answered?.[id];return `<div class="teamview"><div class="between"><h3>ທີມ ${t.team}: ${esc(t.name)}</h3><span class="pill">${hostScoresVisible?`${Number(t.score||0)} ຄະແນນ`:`ຄະແນນ •••`}</span></div><div class="wallet-line"><b>💰 ເງິນຄົງເຫຼືອ</b><strong>${Math.max(0,Number(t.money??100))} 🪙</strong></div><div class="money-track"><div class="money-fill ${Number(t.money??100)<=20?'low':''}" style="width:${Math.max(0,Math.min(100,Number(t.money??100)))}%"></div></div><div class="small muted" style="margin-top:8px">ໄອເທັມ ${(t.inventory||[]).length} • ຕອບແລ້ວ ${t.answered||0}/15</div>${!t.alive?'<b class="dangertext">ແພ້ / ຖືກຄັດອອກ</b>':''}${q?`<div class="qtext">${q.question}</div><div class="choices">${(q.choices||[]).map(c=>`<div class="choice">${c}</div>`).join('')}</div>`:'<p class="muted">ລໍຖ້າຄຳຖາມ</p>'}<div class="notice">${ans?`${ans.correct?'✅ ຕອບຖືກ':'❌ ຕອບຜິດ'} • ຄຳຕອບ: ${esc(ans.choice)}`:'⏳ ກຳລັງຕອບ…'}</div><div class="small">🎒 ${(t.inventory||[]).map(i=>(ITEMS.find(x=>x.id===i.id)||{}).name||i.id).join('、')||'ບໍ່ມີໄອເທັມ'}</div></div>`}).join('');renderHostScoreBoard();renderLiveFeeds();const allDone=teams.length===4&&teams.every(([id,t])=>!t.alive||Number(t.answered||0)>=15);$('hostActions').innerHTML=teams.map(([id,t])=>`<button class="secondary" onclick="hostEliminate('${id}')">ຄັດອອກ: ${esc(t.name)}</button>`).join('')+(allDone?`<button class="gold" onclick="openWinnerPage()">🏆 แสดงผู้ชนะ</button>`:'<span class="muted small">🏆 ปุ่มแสดงผู้ชนะจะปรากฏเมื่อทุกทีมตอบครบ 15 ข้อหรือถูกคัดออก</span>');if(window.MathJax&&typeof MathJax.typesetPromise==='function')MathJax.typesetPromise([$ ('hostTeams')]).catch(()=>{})}
+function renderHostGame(){const teams=Object.entries(state.teams||{}).sort((a,b)=>a[1].team-b[1].team);$('hostRound').textContent=`ຮອບ ${state.game?.round||0}/15`;const left=Math.max(0,Math.ceil(((state.game?.endsAt||Date.now())-Date.now())/1000));$('hostGameTimer').textContent=String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0');$('hostTeams').innerHTML=teams.map(([id,t])=>{const q=state.game?.questionByTeam?.[id],ans=state.game?.answered?.[id];return `<div class="teamview"><div class="between"><h3>ທີມ ${t.team}: ${esc(t.name)}</h3><span class="pill">${hostScoresVisible?`${Number(t.score||0)} ຄະແນນ`:`ຄະແນນ •••`}</span></div><div class="wallet-line"><b>💰 ເງິນຄົງເຫຼືອ</b><strong>${Math.max(0,Number(t.money??100))} 🪙</strong></div><div class="money-track"><div class="money-fill ${Number(t.money??100)<=20?'low':''}" style="width:${Math.max(0,Math.min(100,Number(t.money??100)))}%"></div></div><div class="small muted" style="margin-top:8px">ໄອເທັມ ${(t.inventory||[]).length} • ຕອບແລ້ວ ${t.answered||0}/15</div>${!t.alive?'<b class="dangertext">ແພ້ / ຖືກຄັດອອກ</b>':''}${q?`<div class="qtext">${q.question}</div><div class="choices">${(q.choices||[]).map(c=>`<div class="choice">${c}</div>`).join('')}</div>`:'<p class="muted">ລໍຖ້າຄຳຖາມ</p>'}<div class="notice">${ans?`${ans.correct?'✅ ຕອບຖືກ':'❌ ຕອບຜິດ'} • ຄຳຕອບ: ${esc(ans.choice)}`:'⏳ ກຳລັງຕອບ…'}</div><div class="small">🎒 ${(t.inventory||[]).map(i=>(ITEMS.find(x=>x.id===i.id)||{}).name||i.id).join('、')||'ບໍ່ມີໄອເທັມ'}</div></div>`}).join('');renderHostScoreBoard();renderLiveFeeds();const allDone=teams.length===4&&teams.every(([id,t])=>!t.alive||Number(t.answered||0)>=15);$('hostActions').innerHTML=teams.map(([id,t])=>`<button class="secondary" onclick="hostEliminate('${id}')">ຄັດອອກ: ${esc(t.name)}</button>`).join('')+(allDone?`<button class="gold" onclick="openWinnerPage()">🏆 ສະແດງຜູ້ຊະນະ</button>`:'<span class="muted small">🏆 ປຸ່ມສະແດງຜູ້ຊະນະຈະປາກົດເມື່ອທຸກທີມຕອບຄົບ 15 ຂໍ້ ຫຼື ຖືກຄັດອອກ</span>');if(window.MathJax&&typeof MathJax.typesetPromise==='function')MathJax.typesetPromise([$ ('hostTeams')]).catch(()=>{})}
 let winnerRevealTimers=[];
 function closeWinnerScreen(){
  winnerRevealTimers.forEach(clearTimeout);winnerRevealTimers=[];
@@ -536,7 +539,7 @@ function openWinnerPage(){
  const all=Object.entries(state.teams||{}).map(([id,t])=>({id,...t})).sort((a,b)=>Number(b.score||0)-Number(a.score||0)||Number(a.team||0)-Number(b.team||0));
  if(!all.length)return;
  const ranked=all.slice(0,4);
- const rankMeta={1:{emoji:'🥇',label:'อันดับ 1',cls:'rank1'},2:{emoji:'🥈',label:'อันดับ 2',cls:'rank2'},3:{emoji:'🥉',label:'อันดับ 3',cls:'rank3'},4:{emoji:'🎖️',label:'อันดับ 4',cls:'rank4'}};
+ const rankMeta={1:{emoji:'🥇',label:'ອັນດັບ 1',cls:'rank1'},2:{emoji:'🥈',label:'ອັນດັບ 2',cls:'rank2'},3:{emoji:'🥉',label:'ອັນດັບ 3',cls:'rank3'},4:{emoji:'🎖️',label:'ອັນດັບ 4',cls:'rank4'}};
  const card=(rank,team)=>{const m=rankMeta[rank];return `<div id="winnerRank${rank}" class="winner-step ${m.cls} reveal-hidden"><div class="winner-place">${m.emoji} ${m.label}</div><div class="winner-name">${esc(team?.name||'ບໍ່ມີທີມ')}</div><div class="winner-score">${Number(team?.score||0)} ຄະແນນ</div></div>`};
  const byRank={};ranked.forEach((t,i)=>byRank[i+1]=t);
  const screen=$('winnerScreenOverlay');
